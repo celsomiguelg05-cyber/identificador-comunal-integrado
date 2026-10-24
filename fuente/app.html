@@ -1,0 +1,1071 @@
+<title>Carné Comunal Paxtocá</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#2f3a8f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@500&display=swap">
+<style>
+/* Layout: app de una columna para celular, barra de pestañas fija abajo, hojas emergentes para cada resultado */
+:root{
+  --bg:#f2f3f8; --surface:#ffffff; --sunk:#e8eaf3; --ink:#1b1f3b; --muted:#5a5f80; --line:#d9dcea;
+  --indigo:#2f3a8f; --indigo-ink:#ffffff; --terra:#b5532f;
+  --ok:#1d7a4c; --ok-bg:#e3f4ea; --warn:#9a6200; --warn-bg:#fdf1d8; --bad:#b3261e; --bad-bg:#fbe5e3;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"Atkinson Hyperlegible Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r:14px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11132a; --surface:#1a1d3a; --sunk:#232750; --ink:#eceefa; --muted:#a4a9ca; --line:#2e3360;
+  --indigo:#8e9bff; --indigo-ink:#11132a; --terra:#e3906b;
+  --ok:#62cf94; --ok-bg:#16352a; --warn:#f1b84a; --warn-bg:#3a2d10; --bad:#ff8c82; --bad-bg:#40191a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11132a; --surface:#1a1d3a; --sunk:#232750; --ink:#eceefa; --muted:#a4a9ca; --line:#2e3360;
+  --indigo:#8e9bff; --indigo-ink:#11132a; --terra:#e3906b;
+  --ok:#62cf94; --ok-bg:#16352a; --warn:#f1b84a; --warn-bg:#3a2d10; --bad:#ff8c82; --bad-bg:#40191a; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font:16px/1.45 var(--f-body);padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.mark{width:38px;height:38px;border-radius:10px;background:var(--indigo);color:var(--indigo-ink);display:grid;place-items:center;font-weight:700;letter-spacing:.02em;flex:none}
+.top h1{font-size:17px;margin:0;line-height:1.2}
+.top small{color:var(--muted);font-size:13px;display:block}
+.top .grow{flex:1;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill.live{background:var(--ok-bg);color:var(--ok)}
+.pill.live::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+main{padding-block:16px;display:grid;gap:16px}
+h2{font-size:22px;margin:0;text-wrap:balance}
+h3{font-size:15px;margin:0;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.banner{border-radius:var(--r);padding:12px 14px;font-size:14px;background:var(--warn-bg);color:var(--warn);font-weight:700}
+.banner.bad{background:var(--bad-bg);color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row > .grow{flex:1;min-width:0}
+button,.btn{font:inherit;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:12px 16px;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+button.primary,.btn.primary{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo)}
+button.danger{color:var(--bad);border-color:var(--bad)}
+button.ok{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+button.block,.btn.block{width:100%}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.armed{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+:focus-visible{outline:3px solid var(--terra);outline-offset:2px}
+label{display:grid;gap:4px;font-size:14px;font-weight:700;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;min-height:48px;width:100%}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--sunk);border-radius:14px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;min-height:56px;font-size:18px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0 / .15)}
+.seg button[aria-pressed="true"][data-mode="entrada"]{color:var(--ok)}
+.seg button[aria-pressed="true"][data-mode="salida"]{color:var(--terra)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--sunk);border-radius:12px;padding:10px;text-align:center;min-width:0}
+.stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:12px;color:var(--muted);display:block;line-height:1.25}
+.stat.alert b{color:var(--bad)}
+@media (max-width:380px){.stats{grid-template-columns:repeat(2,1fr)}}
+.viewer{position:relative;background:#000;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;max-width:100%;display:grid;place-items:center}
+.viewer video{width:100%;height:100%;object-fit:cover}
+.viewer .frame{position:absolute;inset:18% 22%;border:3px solid rgb(255 255 255 / .85);border-radius:16px;box-shadow:0 0 0 999px rgb(0 0 0 / .35)}
+.viewer .idle{color:#fff;text-align:center;padding:16px;display:grid;gap:12px;justify-items:center;font-size:15px}
+.list{display:grid;gap:8px}
+.list > *{min-width:0}
+.item{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;width:100%;text-align:left;min-height:64px;font-weight:400}
+.item img,.thumb{width:44px;height:55px;border-radius:8px;object-fit:cover;flex:none;background:var(--sunk)}
+.item .grow{flex:1;min-width:0}
+.item b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item small{color:var(--muted);font-size:13px}
+.code{font-family:var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.tag{font-size:12px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.tag.in{background:var(--ok-bg);color:var(--ok)}
+.tag.out{background:var(--sunk);color:var(--terra)}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.tag.neutral{background:var(--sunk);color:var(--muted)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{border:0;border-radius:0;background:transparent;min-height:var(--nav-h);flex-direction:column;gap:2px;font-size:13px;color:var(--muted);padding:6px 4px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-current="page"]{color:var(--indigo)}
+.sheet{position:fixed;inset:0;z-index:20;background:rgb(10 12 30 / .55);display:flex;align-items:flex-end;justify-content:center}
+.sheet .panel{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:20px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:14px}
+.verdict{border-radius:14px;padding:14px;display:grid;gap:4px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)}
+.verdict.warn{background:var(--warn-bg);color:var(--warn)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad)}
+.verdict strong{font-size:20px;line-height:1.2}
+.verdict p{color:var(--ink)}
+.who{display:flex;gap:16px;align-items:center}
+.who img{width:150px;height:188px;border-radius:12px;object-fit:cover;border:3px solid var(--line);flex:none;background:var(--sunk)}
+.who .grow{min-width:0;display:grid;gap:4px}
+.who b{font-size:22px;line-height:1.2}
+@media (max-width:380px){.who{flex-direction:column;align-items:stretch}.who img{width:100%;height:auto;aspect-ratio:4/5}}
+.cardimg{width:100%;max-width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--sunk)}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
+.foot{font-size:13px;color:var(--muted);text-align:center;padding-block:8px}
+.foot a{color:var(--indigo)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;max-width:calc(100% - 32px)}
+.empty{text-align:center;color:var(--muted);padding:24px 8px}
+.photo-pick{display:flex;gap:12px;align-items:center}
+.photo-pick img{width:96px;height:120px;border-radius:10px;object-fit:cover;background:var(--sunk);border:1px dashed var(--line)}
+.fileBtn{position:relative;overflow:hidden}
+.fileBtn input{position:absolute;inset:0;opacity:0;cursor:pointer;min-height:0}
+@media (prefers-reduced-motion:no-preference){.sheet .panel{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="mark" aria-hidden="true">CC</div>
+  <div class="grow"><h1 id="hdrTitle">Carné comunal</h1><small id="hdrSub">Comunidad de Paxtocá · Totonicapán</small></div>
+  <span class="pill" id="hdrPill">Sin asamblea</span>
+</div></header>
+
+<div class="wrap"><main>
+  <div id="banners" class="list"></div>
+
+  <!-- ASAMBLEA -->
+  <section id="v-asamblea" class="list" style="gap:16px">
+    <div id="asmNone" class="card" hidden>
+      <h2>Abrir una asamblea</h2>
+      <p class="muted">Abra la asamblea al llegar al salón. Desde ese momento puede escanear los carnés en la entrada y en la salida.</p>
+      <form id="asmForm" class="grid2">
+        <label>Tipo<select id="asmTipo"><option value="asamblea">Asamblea</option><option value="faena">Faena</option><option value="reunion">Reunión</option></select></label>
+        <label>Nombre<input id="asmName" required value="Asamblea general"></label>
+        <label>Fecha<input id="asmDate" type="date" required></label>
+        <button class="primary block" type="submit" style="grid-column:1/-1">Abrir asamblea</button>
+      </form>
+    </div>
+    <div id="asmLive" class="list" style="gap:16px" hidden>
+      <div class="card">
+        <div class="row"><div class="grow"><h2 id="asmTitle"></h2><p class="muted" id="asmMeta"></p></div></div>
+        <div class="stats">
+          <div class="stat"><b id="stDentro">0</b><span>Dentro ahora</span></div>
+          <div class="stat"><b id="stEnt">0</b><span>Entradas</span></div>
+          <div class="stat"><b id="stSal">0</b><span>Salidas</span></div>
+          <div class="stat alert"><b id="stAle">0</b><span>Alertas</span></div>
+        </div>
+      </div>
+      <div class="seg" role="group" aria-label="Qué se marca">
+        <button type="button" data-mode="entrada" aria-pressed="true" id="modeIn">Entrada</button>
+        <button type="button" data-mode="salida" aria-pressed="false" id="modeOut">Salida</button>
+      </div>
+      <div class="viewer" id="viewer">
+        <video id="video" playsinline muted hidden></video>
+        <div class="frame" id="frame" hidden></div>
+        <div class="idle" id="camIdle">
+          <span id="camMsg">Apunte la cámara al código del carné.</span>
+          <button class="primary" type="button" id="camStart">Encender cámara</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <span class="btn fileBtn block">Fotografiar carné<input type="file" accept="image/*" capture="environment" id="snapQR" aria-label="Fotografiar carné"></span>
+        <button type="button" class="block" id="manualBtn">Buscar sin carné</button>
+      </div>
+      <div class="card">
+        <h3>Últimos marcajes</h3>
+        <div id="recent" class="list"></div>
+      </div>
+      <button type="button" class="danger block" id="closeAsm">Cerrar asamblea</button>
+    </div>
+  </section>
+
+  <!-- MORADORES -->
+  <section id="v-moradores" class="list" style="gap:16px" hidden>
+    <div class="row">
+      <div class="grow"><h2>Moradores</h2><p class="muted" id="pplCount"></p></div>
+      <button class="primary" type="button" id="addPerson">Registrar</button>
+    </div>
+    <input id="pplSearch" type="search" placeholder="Buscar por nombre, código o sector" aria-label="Buscar morador">
+    <div id="pplList" class="list"></div>
+    <div class="card">
+      <h3>Hoja para imprimir</h3>
+      <p class="muted">Ocho carnés por hoja tamaño carta, a tamaño real (85.6 × 54 mm). Imprima en cartulina o envíe la imagen a la imprenta de PVC.</p>
+      <div id="sheetPages" class="row"></div>
+    </div>
+  </section>
+
+  <!-- REPORTE -->
+  <section id="v-reporte" class="list" style="gap:16px" hidden>
+    <h2>Reporte de asistencia</h2>
+    <label>Asamblea<select id="repSel"></select></label>
+    <div id="repBody" class="list" style="gap:16px"></div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="v-ajustes" class="list" style="gap:16px" hidden>
+    <h2>Ajustes</h2>
+    <form class="card" id="cfgForm">
+      <h3>Comunidad</h3>
+      <div class="grid2">
+        <label>Nombre que sale en el carné<input id="cfgCom" required></label>
+        <label>Lugar<input id="cfgLug" required></label>
+      </div>
+      <button type="submit" class="primary">Guardar</button>
+    </form>
+    <div class="card">
+      <h3>Copia de seguridad</h3>
+      <p class="muted">Los datos se guardan solo en este celular. Descargue una copia al terminar cada asamblea. Para usar un segundo celular, restaure en él la misma copia: así reconoce los mismos carnés.</p>
+      <p class="muted">La copia incluye la llave que firma los carnés. Guárdela en un lugar seguro, porque con ella se podrían fabricar carnés válidos.</p>
+      <div class="grid2">
+        <button type="button" id="bkDown">Descargar copia</button>
+        <span class="btn fileBtn">Restaurar copia<input type="file" accept=".json,application/json" id="bkUp" aria-label="Restaurar copia"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Base comunal</h3>
+      <p class="muted" id="syncState"></p>
+      <form id="syncLogin" class="grid2" hidden>
+        <label>Dirección de la base<input id="syUrl" type="url" placeholder="https://xxxx.supabase.co" required></label>
+        <label>Clave pública de la base<input id="syAnon" required autocomplete="off"></label>
+        <label>Correo del operador<input id="syMail" type="email" required autocomplete="username"></label>
+        <label>Contraseña<input id="syPass" type="password" required autocomplete="current-password"></label>
+        <button type="submit" class="primary" style="grid-column:1/-1">Entrar y sincronizar</button>
+      </form>
+      <div id="syncOn" class="grid2" hidden>
+        <button type="button" class="primary" id="syncBtn">Sincronizar ahora</button>
+        <button type="button" id="syncOut">Salir de la cuenta</button>
+      </div>
+      <p id="syncMsg" class="muted" hidden></p>
+      <p class="muted" style="font-size:14px">Con señal, la app envía sola los marcajes y trae lo que registraron los otros celulares. Sin señal sigue funcionando y envía después.</p>
+    </div>
+    <div class="card">
+      <h3>Datos de ejemplo</h3>
+      <p class="muted" id="demoInfo"></p>
+      <div class="grid2">
+        <button type="button" id="demoOff">Quitar datos de ejemplo</button>
+        <button type="button" id="demoOn">Cargar datos de ejemplo</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Seguridad del carné</h3>
+      <p class="muted">Cada código QR va firmado con la llave de esta comunidad. Un carné copiado a mano, alterado o reemplazado se rechaza al escanearlo. Huella de la llave: <span class="code" id="keyFp"></span></p>
+      <button type="button" class="danger" id="wipe">Borrar todos los datos</button>
+    </div>
+    <p class="foot">Versión piloto 1.2 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+  </section>
+</main></div>
+
+<nav class="tabs" aria-label="Secciones"><div class="in">
+  <button type="button" data-tab="asamblea" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>Asamblea</button>
+  <button type="button" data-tab="moradores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3.5 3.5 0 0 1 0 7M21 20c0-2.6-1.6-4.8-4-5.6"/></svg>Moradores</button>
+  <button type="button" data-tab="reporte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reporte</button>
+  <button type="button" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</button>
+</div></nav>
+
+<div class="sheet" id="sheet" hidden><div class="panel" id="sheetPanel" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden></div>
+<canvas id="work" hidden></canvas>
+
+<script>/*LIBS*/</script>
+<script>
+"use strict";
+/* ===== Utilidades ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const hhmm = t => new Date(t).toLocaleTimeString("es-GT", {hour:"2-digit", minute:"2-digit", hour12:false});
+const fecha = d => new Date(d + (String(d).length === 10 ? "T12:00:00" : "")).toLocaleDateString("es-GT", {day:"numeric", month:"long", year:"numeric"});
+const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const fullName = p => `${p.nombres} ${p.apellidos}`.trim();
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64u = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
+function armConfirm(btn, label, fn){
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("armed")) { btn.classList.remove("armed"); btn.textContent = btn.dataset.orig; clearTimeout(btn._t); fn(); return; }
+    btn.dataset.orig = btn.textContent; btn.textContent = label; btn.classList.add("armed");
+    btn._t = setTimeout(() => { btn.classList.remove("armed"); btn.textContent = btn.dataset.orig; }, 4000);
+  });
+}
+
+/* ===== Almacenamiento (IndexedDB en este celular) ===== */
+const STORES = ["people", "assemblies", "marks", "incidents"];
+const DB = { db: null };
+function idbOpen(){
+  return new Promise((res, rej) => {
+    let r; try { r = indexedDB.open("carne-comunal", 1); } catch (e) { return rej(e); }
+    r.onupgradeneeded = () => { const d = r.result; STORES.forEach(n => d.createObjectStore(n, {keyPath:"id"})); d.createObjectStore("kv"); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+function tx(store, mode, fn){
+  if (!DB.db) return Promise.resolve(undefined);
+  return new Promise((res, rej) => {
+    const t = DB.db.transaction(store, mode); const req = fn(t.objectStore(store));
+    t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error);
+  });
+}
+const put = (st, o) => { if (typeof markPending === "function") markPending(st, o); return tx(st, "readwrite", s => s.put(o)); };
+const del = (st, id) => tx(st, "readwrite", s => s.delete(id));
+const getAll = st => tx(st, "readonly", s => s.getAll());
+const getKV = k => tx("kv", "readonly", s => s.get(k));
+const putKV = (k, v) => tx("kv", "readwrite", s => s.put(v, k));
+const clearStore = st => tx(st, "readwrite", s => s.clear());
+
+/* ===== Estado ===== */
+const S = { people: new Map(), assemblies: new Map(), marks: [], incidents: [], cfg: {comunidad:"Comunidad de Paxtocá", lugar:"Totonicapán", prefijo:"PXT"}, seq: 0, keys: null, mode: "entrada", tab: "asamblea" };
+const activeAsm = () => [...S.assemblies.values()].find(a => a.abierta) || null;
+const marksOf = (aid, pid) => S.marks.filter(m => m.asamblea === aid && m.valido !== false && (!pid || m.persona === pid));
+
+/* ===== Firma de carnés (ECDSA P-256) ===== */
+const ALG = {name:"ECDSA", namedCurve:"P-256"};
+async function ensureKeys(){
+  let k = await getKV("keys");
+  if (!k) {
+    const kp = await crypto.subtle.generateKey(ALG, true, ["sign", "verify"]);
+    k = { priv: await crypto.subtle.exportKey("jwk", kp.privateKey), pub: await crypto.subtle.exportKey("jwk", kp.publicKey) };
+    await putKV("keys", k);
+  }
+  if (!k.master) { k.master = b64u(crypto.getRandomValues(new Uint8Array(32))); await putKV("keys", k); }
+  await loadKeys(k);
+}
+async function loadKeys(k){
+  S.keys = { jwk: k,
+    priv: await crypto.subtle.importKey("jwk", k.priv, ALG, false, ["sign"]),
+    pub: await crypto.subtle.importKey("jwk", k.pub, ALG, false, ["verify"]) };
+  const raw = await crypto.subtle.exportKey("raw", await crypto.subtle.importKey("jwk", k.pub, ALG, true, ["verify"]));
+  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", raw));
+  S.keys.fp = [...h.slice(0, 6)].map(b => b.toString(16).padStart(2, "0")).join(":").toUpperCase();
+}
+const SIGN = {name:"ECDSA", hash:"SHA-256"};
+async function qrText(p){
+  const msg = `CC1|${p.id}|${p.ver}`;
+  const sig = await crypto.subtle.sign(SIGN, S.keys.priv, new TextEncoder().encode(msg));
+  return `${msg}|${b64u(sig)}`;
+}
+/* Carné digital: QR que cambia cada 30 s (HMAC por persona, derivado del secreto de la comunidad) */
+const HM = {name:"HMAC", hash:"SHA-256"};
+const STEP = 30;
+async function hmac(keyBytes, msg){
+  const k = await crypto.subtle.importKey("raw", keyBytes, HM, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg)));
+}
+const personSecret = p => hmac(unb64u(S.keys.jwk.master), `${p.id}|${p.ver}`);
+async function enrollText(p){
+  return `CCE1|${p.id}|${p.ver}|${fullName(p)}|${S.cfg.comunidad}|${b64u(await personSecret(p))}`;
+}
+async function verifyDigital(p, step, code){
+  const now = Math.floor(Date.now() / 1000 / STEP);
+  if (Math.abs(now - step) > 1) return false;
+  const h = await hmac(await personSecret(p), `${p.id}|${p.ver}|${step}`);
+  return b64u(h.slice(0, 12)) === code;
+}
+async function verifySig(msg, sig){
+  try { return await crypto.subtle.verify(SIGN, S.keys.pub, unb64u(sig), new TextEncoder().encode(msg)); } catch { return false; }
+}
+
+/* ===== Reglas de marcaje (núcleo) ===== */
+async function incident(tipo, persona, detalle){
+  const a = activeAsm();
+  const i = { id: uid(), asamblea: a ? a.id : null, persona, tipo, detalle, hora: Date.now(), ejemplo: false };
+  S.incidents.push(i); await put("incidents", i); refreshStats();
+}
+async function evaluateQR(txt){
+  const p = String(txt).trim().split("|");
+  if (p.length === 5 && p[0] === "CC2") return evaluateDigital(p);
+  if (p.length !== 4 || p[0] !== "CC1") return { kind:"bad", title:"Este código no es un carné comunal", detail:"Pida a la persona su carné de la comunidad." };
+  if (!(await verifySig(`${p[0]}|${p[1]}|${p[2]}`, p[3]))) {
+    await incident("firma", null, `Código con firma inválida (dice ${p[1]})`);
+    return { kind:"bad", title:"Carné falso o alterado", detail:"La firma no corresponde a esta comunidad. No registre a la persona con este carné." };
+  }
+  const per = S.people.get(p[1]);
+  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este celular. Restaure la copia más reciente.` };
+  if (String(per.ver) !== p[2]) {
+    await incident("anulado", per.id, `Presentó el carné número ${p[2]}; el vigente es el ${per.ver}`);
+    return { kind:"bad", person: per, title:"Carné anulado", detail:`Este carné fue reemplazado. Solo vale el carné número ${per.ver}.` };
+  }
+  if (per.estado !== "activo") {
+    await incident("baja", per.id, "Carné de un morador dado de baja");
+    return { kind:"bad", person: per, title:"Morador dado de baja", detail:"Este carné ya no está vigente." };
+  }
+  return checkMark(per, "carne");
+}
+async function evaluateDigital(p){
+  const per = S.people.get(p[1]);
+  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este celular. Restaure la copia más reciente.` };
+  if (String(per.ver) !== p[2]) {
+    await incident("anulado", per.id, `Carné digital del número ${p[2]}; el vigente es el ${per.ver}`);
+    return { kind:"bad", person: per, title:"Carné digital anulado", detail:`Este carné fue reemplazado. Debe activar en su celular el carné número ${per.ver}.` };
+  }
+  if (!(await verifyDigital(per, +p[3], p[4]))) {
+    const now = Math.floor(Date.now() / 1000 / STEP), old = Math.abs(now - +p[3]) > 1;
+    await incident(old ? "vencido" : "firma", per.id, old ? "Mostró un código digital vencido (posible captura de pantalla)" : "Código digital con firma inválida");
+    return old ? { kind:"bad", person: per, title:"Código vencido", detail:"Parece una captura de pantalla. El código del celular cambia cada 30 segundos: pida que abra su carné en vivo." }
+               : { kind:"bad", person: per, title:"Carné digital falso o alterado", detail:"El código no corresponde a esta comunidad." };
+  }
+  if (per.estado !== "activo") {
+    await incident("baja", per.id, "Carné digital de un morador dado de baja");
+    return { kind:"bad", person: per, title:"Morador dado de baja", detail:"Este carné ya no está vigente." };
+  }
+  return checkMark(per, "digital");
+}
+async function checkMark(per, via){
+  const a = activeAsm(); const ms = marksOf(a.id, per.id);
+  const ent = ms.find(m => m.tipo === "entrada"), sal = ms.find(m => m.tipo === "salida");
+  if (S.mode === "entrada" && ent) {
+    await incident("doble", per.id, "Intentó marcar entrada por segunda vez");
+    return { kind:"warn", person: per, title:"Ya marcó entrada", detail:`Entró a las ${hhmm(ent.hora)}. No se registra otra vez.` };
+  }
+  if (S.mode === "salida" && !ent) {
+    await incident("sin_entrada", per.id, "Quiso marcar salida sin haber marcado entrada");
+    return { kind:"warn", person: per, title:"No tiene entrada registrada", detail:"No se puede marcar salida de alguien que no marcó entrada." };
+  }
+  if (S.mode === "salida" && sal) {
+    await incident("doble", per.id, "Intentó marcar salida por segunda vez");
+    return { kind:"warn", person: per, title:"Ya marcó salida", detail:`Salió a las ${hhmm(sal.hora)}. No se registra otra vez.` };
+  }
+  return { kind:"ok", person: per, via };
+}
+async function commitMark(per, via, motivo){
+  const a = activeAsm();
+  const m = { id: uid(), asamblea: a.id, persona: per.id, tipo: S.mode, hora: Date.now(), via, motivo: motivo || "", ejemplo: false };
+  S.marks.push(m); await put("marks", m);
+  toast(`${S.mode === "entrada" ? "Entrada" : "Salida"} registrada: ${fullName(per)}`);
+  if (navigator.vibrate) try { navigator.vibrate(80); } catch {}
+  renderAsm();
+}
+
+/* ===== Fotos y dibujos ===== */
+function loadImg(src){ return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+async function fileToPhoto(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImg(url); const W = 360, H = 450;
+    const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+    const r = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+    const w = img.naturalWidth * r, h = img.naturalHeight * r;
+    g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    return c.toDataURL("image/jpeg", 0.8);
+  } finally { URL.revokeObjectURL(url); }
+}
+function demoAvatar(n, hue){
+  const c = document.createElement("canvas"); c.width = 360; c.height = 450; const g = c.getContext("2d");
+  g.fillStyle = `hsl(${hue} 45% 82%)`; g.fillRect(0, 0, 360, 450);
+  g.fillStyle = `hsl(${hue} 35% 38%)`;
+  g.beginPath(); g.arc(180, 170, 78, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.ellipse(180, 430, 150, 160, 0, Math.PI, 0); g.fill();
+  g.fillStyle = "#fff"; g.font = "bold 64px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText(n, 180, 172);
+  g.fillStyle = "rgba(0,0,0,.45)"; g.fillRect(0, 0, 360, 44); g.fillStyle = "#fff"; g.font = "bold 24px sans-serif"; g.fillText("FOTO DE EJEMPLO", 180, 23);
+  return c.toDataURL("image/jpeg", 0.8);
+}
+function drawQR(g, text, x, y, size){
+  const q = qrcode(0, "M"); q.addData(text); q.make();
+  const n = q.getModuleCount(), quiet = 2, cell = size / (n + quiet * 2);
+  g.fillStyle = "#fff"; g.fillRect(x, y, size, size); g.fillStyle = "#000";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c))
+    g.fillRect(Math.floor(x + (c + quiet) * cell), Math.floor(y + (r + quiet) * cell), Math.ceil(cell), Math.ceil(cell));
+}
+function wrap(g, text, x, y, maxW, lh, maxLines){
+  const words = text.split(/\s+/); let line = "", lines = [];
+  for (const w of words) { const t = line ? line + " " + w : w; if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+  if (line) lines.push(line);
+  lines = lines.slice(0, maxLines); lines.forEach((l, i) => g.fillText(l, x, y + i * lh)); return lines.length;
+}
+/* Carné tamaño CR80 a 300 ppp: 1011 × 638 px */
+async function drawCard(g, p, ox = 0, oy = 0){
+  const W = 1011, H = 638, IND = "#2f3a8f", TER = "#b5532f";
+  g.save(); g.translate(ox, oy);
+  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = IND; g.fillRect(0, 0, W, 118);
+  g.fillStyle = "#fff"; g.textBaseline = "alphabetic"; g.textAlign = "left";
+  g.font = "bold 42px 'Atkinson Hyperlegible', sans-serif"; g.fillText(S.cfg.comunidad, 40, 62);
+  g.font = "26px 'Atkinson Hyperlegible', sans-serif"; g.fillText(`Carné comunal · ${S.cfg.lugar}`, 40, 98);
+  const img = await loadImg(p.foto);
+  g.drawImage(img, 40, 146, 248, 310); g.strokeStyle = "#d9dcea"; g.lineWidth = 3; g.strokeRect(40, 146, 248, 310);
+  g.fillStyle = "#1b1f3b"; g.font = "bold 40px 'Atkinson Hyperlegible', sans-serif";
+  const nl = wrap(g, p.nombres, 316, 186, 380, 44, 2);
+  const nl2 = wrap(g, p.apellidos, 316, 186 + nl * 44, 380, 44, 2);
+  let y = 186 + (nl + nl2) * 44 + 20;
+  g.font = "22px 'Atkinson Hyperlegible', sans-serif"; g.fillStyle = "#5a5f80"; g.fillText("CÓDIGO", 316, y);
+  g.font = "bold 44px 'Atkinson Hyperlegible Mono', monospace"; g.fillStyle = "#1b1f3b"; g.fillText(p.id, 316, y + 46);
+  y += 90;
+  if (p.sector) { g.font = "22px 'Atkinson Hyperlegible', sans-serif"; g.fillStyle = "#5a5f80"; g.fillText("SECTOR", 316, y); g.font = "bold 30px 'Atkinson Hyperlegible', sans-serif"; g.fillStyle = "#1b1f3b"; wrap(g, p.sector, 316, y + 36, 380, 34, 1); }
+  drawQR(g, await qrText(p), 716, 150, 260);
+  g.fillStyle = "#5a5f80"; g.font = "22px 'Atkinson Hyperlegible', sans-serif"; g.textAlign = "center";
+  g.fillText(`Carné número ${p.ver}`, 846, 440);
+  g.textAlign = "left";
+  g.fillStyle = TER; g.fillRect(0, H - 14, W, 14);
+  g.fillStyle = "#5a5f80"; g.font = "19px 'Atkinson Hyperlegible', sans-serif";
+  g.fillText("Personal e intransferible. Si lo encuentra, entréguelo a la alcaldía comunal.", 40, H - 62);
+  g.fillText("Creado por Tecnoiagt · www.tecnoiagt.com", 40, H - 34);
+  if (p.ejemplo) { g.save(); g.translate(360, 330); g.rotate(-0.3); g.fillStyle = "rgba(181,83,47,.25)"; g.font = "bold 110px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("EJEMPLO", 0, 0); g.restore(); }
+  g.strokeStyle = "#c9ccd9"; g.lineWidth = 2; g.strokeRect(1, 1, W - 2, H - 2);
+  g.restore();
+}
+async function cardCanvas(p){ const c = document.createElement("canvas"); c.width = 1011; c.height = 638; await drawCard(c.getContext("2d"), p); return c; }
+async function sheetCanvas(list){
+  const c = document.createElement("canvas"); c.width = 2550; c.height = 3300; const g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+  for (let i = 0; i < list.length; i++) {
+    const col = i % 2, row = Math.floor(i / 2), x = 234 + col * (1011 + 60), y = 284 + row * (638 + 60);
+    await drawCard(g, list[i], x, y);
+    g.setLineDash([12, 10]); g.strokeStyle = "#999"; g.lineWidth = 2; g.strokeRect(x - 6, y - 6, 1023, 650); g.setLineDash([]);
+  }
+  g.fillStyle = "#666"; g.font = "28px sans-serif"; g.fillText(`${S.cfg.comunidad} · hoja de carnés · recorte por la línea punteada · 300 ppp, imprimir al 100 %`, 234, 3220);
+  return c;
+}
+const canvasBlob = c => new Promise(r => c.toBlob(r, "image/png"));
+
+/* ===== Descargas ===== */
+let dlCap;
+async function saveFile(filename, data){
+  if (window.claude && window.claude.use) {
+    if (dlCap === undefined) dlCap = await window.claude.use("downloads");
+    if (dlCap) {
+      try { await dlCap.save({filename, data}); toast("Archivo listo"); return; }
+      catch (e) { if (e && e.code === "declined") return; if (!["unavailable","not_granted","capability_disabled","capability_removed"].includes(e && e.code)) { toast("No se pudo guardar el archivo"); return; } }
+    }
+  }
+  const blob = data instanceof Blob ? data : new Blob([data]);
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ===== Hoja emergente ===== */
+function openSheet(html, onClose){
+  $("#sheetPanel").innerHTML = html; $("#sheet").hidden = false; openSheet.onClose = onClose;
+  const f = $("#sheetPanel").querySelector("button,input,select"); if (f) f.focus({preventScroll:true});
+}
+function closeSheet(){ $("#sheet").hidden = true; $("#sheetPanel").innerHTML = ""; const f = openSheet.onClose; openSheet.onClose = null; if (f) f(); }
+$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet").hidden) closeSheet(); });
+
+/* ===== Pestañas ===== */
+function showTab(t){
+  S.tab = t;
+  document.querySelectorAll("nav.tabs button").forEach(b => { if (b.dataset.tab === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  ["asamblea","moradores","reporte","ajustes"].forEach(n => $("#v-" + n).hidden = n !== t);
+  if (t !== "asamblea") stopCam();
+  ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport, ajustes: renderSettings})[t]();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+
+/* ===== Encabezado y avisos ===== */
+function renderChrome(){
+  $("#hdrSub").textContent = `${S.cfg.comunidad} · ${S.cfg.lugar}`;
+  const a = activeAsm(); const pill = $("#hdrPill");
+  pill.textContent = a ? "Asamblea abierta" : "Sin asamblea"; pill.classList.toggle("live", !!a);
+  const b = [];
+  if (!DB.db) b.push(`<div class="banner bad">Este navegador no permite guardar datos. Lo que registre se perderá al cerrar la página.</div>`);
+  if ([...S.people.values()].some(p => p.ejemplo)) b.push(`<div class="banner">Está viendo personas ficticias de ejemplo. Quítelas en Ajustes antes de registrar a los moradores reales.</div>`);
+  $("#banners").innerHTML = b.join(""); $("#banners").hidden = !b.length;
+}
+
+/* ===== Asamblea ===== */
+function refreshStats(){
+  const a = activeAsm(); if (!a) return;
+  const ms = marksOf(a.id), ent = ms.filter(m => m.tipo === "entrada"), sal = ms.filter(m => m.tipo === "salida");
+  $("#stEnt").textContent = ent.length; $("#stSal").textContent = sal.length; $("#stDentro").textContent = ent.length - sal.length;
+  $("#stAle").textContent = S.incidents.filter(i => i.asamblea === a.id).length;
+}
+function renderAsm(){
+  renderChrome();
+  const a = activeAsm();
+  $("#asmNone").hidden = !!a; $("#asmLive").hidden = !a;
+  if (!a) { if (!$("#asmDate").value) $("#asmDate").value = todayISO(); stopCam(); return; }
+  $("#asmTitle").textContent = a.nombre; $("#asmMeta").textContent = `${TIPO[a.tipo] || "Asamblea"} · ${fecha(a.fecha)} · abierta a las ${hhmm(a.abierta_en)}`;
+  refreshStats();
+  ["modeIn","modeOut"].forEach(id => { const b = $("#" + id); b.setAttribute("aria-pressed", String(b.dataset.mode === S.mode)); });
+  const ms = marksOf(a.id).slice().sort((x, y) => y.hora - x.hora).slice(0, 8);
+  $("#recent").innerHTML = ms.length ? ms.map(m => { const p = S.people.get(m.persona); if (!p) return "";
+    return `<div class="item"><img src="${p.foto}" alt=""><div class="grow"><b>${esc(fullName(p))}</b><small class="code">${esc(p.id)}</small>${m.via === "manual" ? ` <small>· sin carné</small>` : m.via === "digital" ? ` <small>· celular</small>` : ""}</div><span class="tag ${m.tipo === "entrada" ? "in" : "out"}">${m.tipo === "entrada" ? "Entró" : "Salió"} ${hhmm(m.hora)}</span></div>`; }).join("")
+    : `<p class="empty">Todavía no hay marcajes en esta asamblea.</p>`;
+}
+$("#asmForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const a = { id: uid(), tipo: $("#asmTipo").value, nombre: $("#asmName").value.trim() || "Asamblea", fecha: $("#asmDate").value || todayISO(), abierta: true, abierta_en: Date.now(), cerrada_en: null, ejemplo: false };
+  S.assemblies.set(a.id, a); await put("assemblies", a); S.mode = "entrada"; renderAsm(); toast("Asamblea abierta");
+});
+armConfirm($("#closeAsm"), "Toque otra vez para cerrar", async () => {
+  const a = activeAsm(); if (!a) return; a.abierta = false; a.cerrada_en = Date.now(); await put("assemblies", a);
+  stopCam(); toast("Asamblea cerrada. Revise el reporte."); renderAsm();
+});
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { S.mode = b.dataset.mode; renderAsm(); }));
+
+/* ===== Escáner ===== */
+const Scan = { stream: null, running: false, detector: null, busy: false, last: "", lastT: 0 };
+async function startCam(){
+  const msg = $("#camMsg");
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg.textContent = "Este navegador no permite usar la cámara en vivo. Use «Fotografiar carné»."; return; }
+  try { Scan.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}, width:{ideal:1280}}, audio:false}); }
+  catch (e) { msg.textContent = "No se pudo encender la cámara en vivo en esta pantalla. Use «Fotografiar carné», que abre la cámara del celular."; return; }
+  const v = $("#video"); v.srcObject = Scan.stream; v.hidden = false; $("#frame").hidden = false; $("#camIdle").hidden = true;
+  try { await v.play(); } catch {}
+  if (!Scan.detector && "BarcodeDetector" in window) { try { const f = await BarcodeDetector.getSupportedFormats(); if (f.includes("qr_code")) Scan.detector = new BarcodeDetector({formats:["qr_code"]}); } catch {} }
+  Scan.running = true; loopScan();
+}
+function stopCam(){
+  Scan.running = false;
+  if (Scan.stream) { Scan.stream.getTracks().forEach(t => t.stop()); Scan.stream = null; }
+  const v = $("#video"); if (v) { v.srcObject = null; v.hidden = true; $("#frame").hidden = true; $("#camIdle").hidden = false; }
+}
+async function decodeSource(src, w, h){
+  if (Scan.detector) { try { const r = await Scan.detector.detect(src); if (r[0]) return r[0].rawValue; } catch {} }
+  const c = $("#work"), s = Math.min(1, 800 / Math.max(w, h)); c.width = Math.round(w * s); c.height = Math.round(h * s);
+  const g = c.getContext("2d", {willReadFrequently:true}); g.drawImage(src, 0, 0, c.width, c.height);
+  const r = jsQR(g.getImageData(0, 0, c.width, c.height).data, c.width, c.height, {inversionAttempts:"attemptBoth"});
+  return r ? r.data : null;
+}
+async function loopScan(){
+  if (!Scan.running) return;
+  const v = $("#video");
+  if (!Scan.busy && v.readyState >= 2 && v.videoWidth) {
+    const t = await decodeSource(v, v.videoWidth, v.videoHeight);
+    if (t && !(t === Scan.last && Date.now() - Scan.lastT < 5000)) { Scan.last = t; Scan.lastT = Date.now(); handleQR(t); }
+  }
+  setTimeout(loopScan, 140);
+}
+$("#camStart").addEventListener("click", startCam);
+$("#snapQR").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const url = URL.createObjectURL(f);
+  try { const img = await loadImg(url); const t = await decodeSource(img, img.naturalWidth, img.naturalHeight);
+    if (t) handleQR(t); else toast("No se encontró el código. Acerque más el carné y tome otra foto.");
+  } finally { URL.revokeObjectURL(url); }
+});
+async function handleQR(txt){
+  if (Scan.busy || !activeAsm()) return; Scan.busy = true;
+  showVerdict(await evaluateQR(txt));
+}
+function whoBlock(p){
+  return `<div class="who"><img src="${p.foto}" alt="Foto de ${esc(fullName(p))}"><div class="grow"><b>${esc(fullName(p))}</b><span class="code">${esc(p.id)}</span><span class="muted">${esc(p.sector || "")}</span><span class="muted">${p.nacimiento ? esc(edad(p.nacimiento)) + " años" : ""}</span></div></div>`;
+}
+const edad = d => { const b = new Date(d + "T12:00:00"), n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--; return a; };
+function showVerdict(v, motivo){
+  const done = () => { Scan.busy = false; };
+  const word = S.mode === "entrada" ? "entrada" : "salida";
+  if (v.kind === "ok") {
+    openSheet(`
+      ${whoBlock(v.person)}
+      <div class="verdict ok"><strong>Carné válido</strong><p>Mire a la persona. Registre la ${word} solo si es la misma de la foto.</p></div>
+      ${v.via === "manual" ? `<div class="verdict warn"><strong>Sin carné</strong><p>Quedará anotado como marcaje manual. Motivo: ${esc(motivo)}.</p></div>` : ""}
+      <button class="ok block" type="button" id="vYes">Sí, es la persona · marcar ${word}</button>
+      <button class="danger block" type="button" id="vNo">No es la persona</button>`, done);
+    $("#vYes").addEventListener("click", async () => { await commitMark(v.person, v.via, motivo); closeSheet(); });
+    $("#vNo").addEventListener("click", async () => { await incident("suplantacion", v.person.id, "La foto no coincide con quien presentó el carné"); closeSheet(); toast("Alerta registrada: posible suplantación"); renderAsm(); });
+  } else {
+    openSheet(`
+      ${v.person ? whoBlock(v.person) : ""}
+      <div class="verdict ${v.kind}"><strong>${esc(v.title)}</strong><p>${esc(v.detail)}</p></div>
+      <button class="primary block" type="button" id="vOk">Entendido</button>`, done);
+    $("#vOk").addEventListener("click", closeSheet);
+    renderAsm();
+  }
+}
+$("#manualBtn").addEventListener("click", () => {
+  if (Scan.busy) return; Scan.busy = true;
+  openSheet(`<h2>Buscar sin carné</h2><p class="muted">Use esto solo si la persona olvidó o perdió su carné. Igual debe comparar la foto.</p>
+    <label>Motivo<select id="mMot"><option>Olvidó el carné</option><option>Carné perdido</option><option>Carné dañado, no se lee</option></select></label>
+    <input id="mQ" type="search" placeholder="Nombre o código" aria-label="Nombre o código"><div id="mRes" class="list"></div>
+    <button type="button" class="block" id="mCancel">Cancelar</button>`, () => { Scan.busy = false; });
+  const draw = () => { const q = $("#mQ").value.trim().toLowerCase();
+    const r = [...S.people.values()].filter(p => p.estado === "activo" && (!q || (fullName(p) + " " + p.id).toLowerCase().includes(q))).slice(0, 12);
+    $("#mRes").innerHTML = r.map(p => `<button type="button" class="item" data-id="${esc(p.id)}"><img src="${p.foto}" alt=""><span class="grow"><b>${esc(fullName(p))}</b><small class="code">${esc(p.id)}</small></span></button>`).join("") || `<p class="empty">Nadie coincide.</p>`; };
+  $("#mQ").addEventListener("input", draw); draw();
+  $("#mRes").addEventListener("click", async e => { const b = e.target.closest("[data-id]"); if (!b) return;
+    const p = S.people.get(b.dataset.id), mot = $("#mMot").value; openSheet.onClose = null; closeSheet(); Scan.busy = true;
+    showVerdict(await checkMark(p, "manual"), mot); });
+  $("#mCancel").addEventListener("click", closeSheet);
+});
+
+/* ===== Moradores ===== */
+function renderPeople(){
+  renderChrome();
+  const all = [...S.people.values()].sort((a, b) => a.id.localeCompare(b.id));
+  const act = all.filter(p => p.estado === "activo");
+  $("#pplCount").textContent = `${act.length} con carné vigente${all.length > act.length ? ` · ${all.length - act.length} de baja` : ""}`;
+  const q = $("#pplSearch").value.trim().toLowerCase();
+  const list = all.filter(p => !q || `${fullName(p)} ${p.id} ${p.sector}`.toLowerCase().includes(q));
+  $("#pplList").innerHTML = list.map(p => `<button type="button" class="item" data-id="${esc(p.id)}"><img src="${p.foto}" alt=""><span class="grow"><b>${esc(fullName(p))}</b><small><span class="code">${esc(p.id)}</span> · ${esc(p.sector || "Sin sector")}</small></span>${p.estado !== "activo" ? `<span class="tag bad">De baja</span>` : p.ver > 1 ? `<span class="tag neutral">Carné ${p.ver}</span>` : ""}</button>`).join("")
+    || `<p class="empty">${all.length ? "Nadie coincide con la búsqueda." : "Todavía no hay moradores. Toque «Registrar» para empezar el padrón."}</p>`;
+  const pages = Math.ceil(act.length / 8);
+  $("#sheetPages").innerHTML = pages ? Array.from({length: pages}, (_, i) => `<button type="button" data-page="${i}">Hoja ${i + 1} (${Math.min(8, act.length - i * 8)} carnés)</button>`).join("") : `<p class="muted">No hay carnés vigentes.</p>`;
+}
+$("#pplSearch").addEventListener("input", renderPeople);
+$("#pplList").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b) personDetail(b.dataset.id); });
+$("#sheetPages").addEventListener("click", async e => {
+  const b = e.target.closest("[data-page]"); if (!b) return; b.disabled = true;
+  const act = [...S.people.values()].filter(p => p.estado === "activo").sort((a, c) => a.id.localeCompare(c.id));
+  const i = +b.dataset.page; const c = await sheetCanvas(act.slice(i * 8, i * 8 + 8));
+  await saveFile(`carnes-hoja-${i + 1}.png`, await canvasBlob(c)); b.disabled = false;
+});
+async function personDetail(id){
+  const p = S.people.get(id);
+  openSheet(`${whoBlock(p)}
+    <img class="cardimg" id="dCard" alt="Vista del carné de ${esc(fullName(p))}">
+    <p class="muted">${esc(p.oficio || "Sin oficio anotado")}${p.telefono ? " · Tel. " + esc(p.telefono) : ""}${p.anulados && p.anulados.length ? ` · Carnés anulados: ${p.anulados.map(a => "nº " + a.ver).join(", ")}` : ""}</p>
+    <div class="grid2">
+      <button type="button" class="primary" id="dDown" ${p.estado !== "activo" ? "disabled" : ""}>Descargar carné</button>
+      <button type="button" id="dEdit">Editar datos</button>
+      <button type="button" id="dDig" ${p.estado !== "activo" ? "disabled" : ""}>Carné en el celular</button>
+      <button type="button" class="danger" id="dRe" ${p.estado !== "activo" ? "disabled" : ""}>Reponer carné (anula el actual)</button>
+      <button type="button" class="danger" id="dBaja">${p.estado === "activo" ? "Dar de baja" : "Reactivar"}</button>
+    </div>
+    <button type="button" class="block" id="dClose">Cerrar</button>`);
+  const c = await cardCanvas(p); if ($("#dCard")) $("#dCard").src = c.toDataURL("image/png");
+  $("#dClose").addEventListener("click", closeSheet);
+  $("#dDown").addEventListener("click", async () => saveFile(`carne-${p.id}-${p.ver}.png`, await canvasBlob(await cardCanvas(p))));
+  $("#dEdit").addEventListener("click", () => personForm(p));
+  $("#dDig").addEventListener("click", () => digitalEnroll(p));
+  armConfirm($("#dRe"), "Toque otra vez: el carné actual dejará de valer", async () => {
+    p.anulados = [...(p.anulados || []), {ver: p.ver, fecha: Date.now()}]; p.ver += 1; await put("people", p);
+    toast(`Carné número ${p.ver} emitido. El anterior ya no vale.`); personDetail(p.id); renderPeople();
+  });
+  armConfirm($("#dBaja"), "Toque otra vez para confirmar", async () => {
+    p.estado = p.estado === "activo" ? "baja" : "activo"; await put("people", p); personDetail(p.id); renderPeople();
+  });
+}
+async function digitalEnroll(p){
+  const t = await enrollText(p);
+  const c = document.createElement("canvas"); c.width = c.height = 600; drawQR(c.getContext("2d"), t, 0, 0, 600);
+  openSheet(`<h2>Carné en el celular</h2>
+    <p>Para ${esc(fullName(p))} (<span class="code">${esc(p.id)}</span>, carné número ${p.ver}).</p>
+    <ol class="muted" style="margin:0;padding-left:20px;display:grid;gap:4px"><li>En el celular del morador, abra la página «Mi carné».</li><li>Toque «Fotografiar código» y tome foto de este código, o pegue el texto que copie aquí.</li><li>Desde ese momento su celular muestra un QR que cambia cada 30 segundos.</li></ol>
+    <img src="${c.toDataURL()}" alt="Código de activación" style="width:100%;max-width:320px;justify-self:center;border-radius:10px;background:#fff">
+    <div class="verdict warn"><strong>Muéstrelo solo al titular</strong><p>Quien tenga este código puede activar el carné. Si se reemplaza el carné, este código deja de servir.</p></div>
+    <button type="button" class="primary block" id="eCopy">Copiar código para enviarlo</button>
+    <button type="button" class="block" id="eBack">Volver</button>`);
+  $("#eCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(t); toast("Código copiado"); }
+    catch { openSheet(`<h2>Copie este texto</h2><textarea readonly style="width:100%;min-height:140px;font:14px var(--f-mono)">${esc(t)}</textarea><button type="button" class="block" id="eBack">Volver</button>`); $("#eBack").addEventListener("click", () => personDetail(p.id)); const ta = $("#sheetPanel textarea"); ta.focus(); ta.select(); }
+  });
+  $("#eBack").addEventListener("click", () => personDetail(p.id));
+}
+function personForm(p){
+  const isNew = !p; p = p || { nombres:"", apellidos:"", nacimiento:"", sector:"", oficio:"", telefono:"", foto:"" };
+  let foto = p.foto;
+  openSheet(`<h2>${isNew ? "Registrar morador" : "Editar datos"}</h2>
+    <form id="pf" class="list" style="gap:12px">
+      <div class="photo-pick"><img id="pfImg" alt="Foto del morador" ${foto ? `src="${foto}"` : ""}>
+        <span class="btn fileBtn">${foto ? "Cambiar foto" : "Tomar foto"}<input type="file" accept="image/*" capture="user" id="pfFile" aria-label="Tomar foto"></span></div>
+      <p class="muted" style="font-size:14px">De frente, sin gorra ni lentes oscuros, con buena luz. Esta foto es la que verá quien escanea.</p>
+      <div class="grid2">
+        <label>Nombres<input id="pfN" required value="${esc(p.nombres)}" autocomplete="off"></label>
+        <label>Apellidos<input id="pfA" required value="${esc(p.apellidos)}" autocomplete="off"></label>
+        <label>Fecha de nacimiento<input id="pfB" type="date" value="${esc(p.nacimiento)}"></label>
+        <label>Sector o paraje<input id="pfS" value="${esc(p.sector)}" list="sectores"></label>
+        <label>Oficio<input id="pfO" value="${esc(p.oficio)}"></label>
+        <label>Teléfono<input id="pfT" type="tel" inputmode="tel" value="${esc(p.telefono)}"></label>
+      </div>
+      <datalist id="sectores">${[...new Set([...S.people.values()].map(x => x.sector).filter(Boolean))].map(s => `<option value="${esc(s)}">`).join("")}</datalist>
+      <p id="pfErr" class="verdict bad" hidden></p>
+      <button class="primary block" type="submit">${isNew ? "Guardar y crear carné" : "Guardar cambios"}</button>
+      <button class="block" type="button" id="pfCancel">Cancelar</button>
+    </form>`);
+  $("#pfFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; foto = await fileToPhoto(f); $("#pfImg").src = foto; });
+  $("#pfCancel").addEventListener("click", () => isNew ? closeSheet() : personDetail(p.id));
+  $("#pf").addEventListener("submit", async e => {
+    e.preventDefault();
+    const err = $("#pfErr");
+    if (!foto) { err.textContent = "Falta la foto. Sin foto no se puede comprobar quién presenta el carné."; err.hidden = false; return; }
+    const n = $("#pfN").value.trim(), a = $("#pfA").value.trim();
+    const dup = [...S.people.values()].find(x => x.id !== p.id && x.nacimiento && x.nacimiento === $("#pfB").value && fullName(x).toLowerCase() === `${n} ${a}`.toLowerCase());
+    if (dup && !err.dataset.ok) { err.textContent = `Ya existe ${fullName(dup)} (${dup.id}) con la misma fecha de nacimiento. Cada persona solo puede tener un carné. Si de verdad es otra persona, toque «Guardar» otra vez.`; err.hidden = false; err.dataset.ok = "1"; return; }
+    Object.assign(p, { nombres: n, apellidos: a, nacimiento: $("#pfB").value, sector: $("#pfS").value.trim(), oficio: $("#pfO").value.trim(), telefono: $("#pfT").value.trim(), foto });
+    if (isNew) { S.seq += 1; await putKV("seq", S.seq); Object.assign(p, { id: `${S.cfg.prefijo}-${String(S.seq).padStart(4, "0")}`, ver: 1, estado: "activo", creado: Date.now(), anulados: [], ejemplo: false }); }
+    S.people.set(p.id, p); await put("people", p);
+    toast(isNew ? `Registrado con el código ${p.id}` : "Datos guardados"); renderPeople(); personDetail(p.id);
+  });
+}
+$("#addPerson").addEventListener("click", () => personForm(null));
+
+/* ===== Reporte ===== */
+function reportRows(a){
+  const people = [...S.people.values()].filter(p => p.estado === "activo" || marksOf(a.id, p.id).length).sort((x, y) => x.id.localeCompare(y.id));
+  return people.map(p => {
+    const ms = marksOf(a.id, p.id), e = ms.find(m => m.tipo === "entrada"), s = ms.find(m => m.tipo === "salida");
+    let est = "Ausente", cls = "bad";
+    if (e && s) { est = "Completa"; cls = "in"; } else if (e) { est = a.abierta ? "Dentro" : "Sin salida"; cls = a.abierta ? "in" : "warn"; }
+    return { p, e, s, est, cls, min: e && s ? Math.round((s.hora - e.hora) / 60000) : null, manual: ms.some(m => m.via === "manual") };
+  });
+}
+const TIPO = { asamblea:"Asamblea", faena:"Faena", reunion:"Reunión" };
+const INC = { vencido:"Código vencido (captura)", firma:"Carné falso o alterado", anulado:"Carné anulado", doble:"Doble marcaje", suplantacion:"La foto no coincide", sin_entrada:"Salida sin entrada", baja:"Morador de baja", otro:"Otro" };
+function renderReport(){
+  renderChrome();
+  const asms = [...S.assemblies.values()].sort((a, b) => b.abierta_en - a.abierta_en);
+  const sel = $("#repSel"), cur = sel.value;
+  sel.innerHTML = asms.map(a => `<option value="${a.id}">${esc(TIPO[a.tipo] || "Asamblea")}: ${esc(a.nombre)} · ${esc(fecha(a.fecha))}${a.abierta ? " (abierta)" : ""}</option>`).join("");
+  if (cur && S.assemblies.has(cur)) sel.value = cur;
+  const a = S.assemblies.get(sel.value);
+  if (!a) { $("#repBody").innerHTML = `<p class="empty">Todavía no hay asambleas. Abra una en la pestaña Asamblea.</p>`; return; }
+  const rows = reportRows(a), inc = S.incidents.filter(i => i.asamblea === a.id).sort((x, y) => x.hora - y.hora);
+  const cnt = k => rows.filter(r => r.est === k).length;
+  const asist = rows.filter(r => r.e).length;
+  $("#repBody").innerHTML = `
+    <div class="stats">
+      <div class="stat"><b>${asist}</b><span>Asistieron de ${rows.length}</span></div>
+      <div class="stat"><b>${cnt("Completa")}</b><span>Entrada y salida</span></div>
+      <div class="stat"><b>${cnt("Sin salida") + cnt("Dentro")}</b><span>${a.abierta ? "Dentro ahora" : "Sin salida"}</span></div>
+      <div class="stat alert"><b>${cnt("Ausente")}</b><span>Ausentes</span></div>
+    </div>
+    <div class="tablebox"><table><thead><tr><th>Morador</th><th>Entrada</th><th>Salida</th><th>Tiempo</th><th>Estado</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td><b>${esc(fullName(r.p))}</b><br><small class="code muted">${esc(r.p.id)}</small>${r.manual ? ` <span class="tag warn">sin carné</span>` : ""}</td><td class="num">${r.e ? hhmm(r.e.hora) : "–"}</td><td class="num">${r.s ? hhmm(r.s.hora) : "–"}</td><td class="num">${r.min != null ? r.min + " min" : "–"}</td><td><span class="tag ${r.cls}">${r.est}</span></td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="card"><h3>Alertas (${inc.length})</h3>
+      ${inc.length ? `<div class="list">${inc.map(i => { const p = S.people.get(i.persona); return `<div class="item"><span class="tag bad">${hhmm(i.hora)}</span><div class="grow"><b>${esc(INC[i.tipo] || i.tipo)}</b><small>${p ? esc(fullName(p)) + " · " : ""}${esc(i.detalle)}</small></div></div>`; }).join("")}</div>` : `<p class="muted">Sin alertas en esta asamblea.</p>`}
+    </div>
+    <button type="button" class="primary block" id="repCsv">Descargar reporte (CSV para Excel)</button>`;
+  $("#repCsv").addEventListener("click", () => {
+    const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const lines = [["Código","Nombres","Apellidos","Sector","Entrada","Salida","Minutos","Estado","Sin carné"].map(q).join(",")]
+      .concat(rows.map(r => [r.p.id, r.p.nombres, r.p.apellidos, r.p.sector, r.e ? hhmm(r.e.hora) : "", r.s ? hhmm(r.s.hora) : "", r.min ?? "", r.est, r.manual ? "sí" : ""].map(q).join(",")))
+      .concat(["", q("Alertas")], inc.map(i => [hhmm(i.hora), INC[i.tipo] || i.tipo, i.persona || "", i.detalle].map(q).join(",")));
+    saveFile(`asistencia-${a.fecha}.csv`, "﻿" + lines.join("\r\n"));
+  });
+}
+$("#repSel").addEventListener("change", renderReport);
+
+/* ===== Ajustes ===== */
+function renderSettings(){
+  renderChrome();
+  $("#cfgCom").value = S.cfg.comunidad; $("#cfgLug").value = S.cfg.lugar; $("#keyFp").textContent = S.keys ? S.keys.fp : "–";
+  const n = [...S.people.values()].filter(p => p.ejemplo).length;
+  $("#demoInfo").textContent = n ? `Hay ${n} personas ficticias y una asamblea de prueba para practicar. Quítelas antes del piloto.` : "No hay datos de ejemplo cargados. Puede cargarlos para practicar con el escáner.";
+  $("#demoOff").disabled = !n; $("#demoOn").disabled = !!n;
+  renderSyncCard();
+}
+$("#cfgForm").addEventListener("submit", async e => { e.preventDefault(); S.cfg.comunidad = $("#cfgCom").value.trim(); S.cfg.lugar = $("#cfgLug").value.trim(); await putKV("cfg", S.cfg); renderSettings(); toast("Guardado"); });
+$("#bkDown").addEventListener("click", () => {
+  const data = { app:"carne-comunal", v:1, exportado: new Date().toISOString(), cfg: S.cfg, seq: S.seq, keys: S.keys.jwk,
+    people:[...S.people.values()], assemblies:[...S.assemblies.values()], marks:S.marks, incidents:S.incidents };
+  saveFile(`copia-carne-comunal-${todayISO()}.json`, JSON.stringify(data));
+});
+$("#bkUp").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  let d; try { d = JSON.parse(await f.text()); } catch { toast("El archivo no es una copia válida"); return; }
+  if (d.app !== "carne-comunal" || !d.keys || !Array.isArray(d.people)) { toast("El archivo no es una copia del carné comunal"); return; }
+  openSheet(`<h2>Restaurar copia</h2><p>La copia es del ${esc(new Date(d.exportado).toLocaleString("es-GT"))} y trae ${d.people.length} moradores y ${d.assemblies.length} asambleas.</p>
+    <div class="verdict warn"><strong>Se reemplazará todo lo que hay en este celular</strong><p>Incluida la llave de firma. Los carnés firmados por otra llave dejarán de valer aquí.</p></div>
+    <button class="danger block" type="button" id="rsYes">Reemplazar con la copia</button><button class="block" type="button" id="rsNo">Cancelar</button>`);
+  $("#rsNo").addEventListener("click", closeSheet);
+  $("#rsYes").addEventListener("click", async () => {
+    await Promise.all(STORES.map(clearStore));
+    for (const p of d.people) await put("people", p); for (const a of d.assemblies) await put("assemblies", a);
+    for (const m of d.marks) await put("marks", m); for (const i of d.incidents) await put("incidents", i);
+    await putKV("keys", d.keys); await putKV("cfg", d.cfg); await putKV("seq", d.seq); await putKV("seeded", true);
+    await loadAll(); closeSheet(); toast("Copia restaurada"); showTab("asamblea");
+  });
+});
+$("#demoOff").addEventListener("click", async () => {
+  for (const p of [...S.people.values()].filter(p => p.ejemplo)) { S.people.delete(p.id); await del("people", p.id); }
+  for (const a of [...S.assemblies.values()].filter(a => a.ejemplo)) { S.assemblies.delete(a.id); await del("assemblies", a.id); }
+  for (const m of S.marks.filter(m => m.ejemplo)) await del("marks", m.id);
+  for (const i of S.incidents.filter(i => i.ejemplo)) await del("incidents", i.id);
+  S.marks = S.marks.filter(m => !m.ejemplo); S.incidents = S.incidents.filter(i => !i.ejemplo);
+  if (!S.people.size) { S.seq = 0; await putKV("seq", 0); }
+  stopCam(); renderSettings(); toast("Datos de ejemplo quitados");
+});
+$("#demoOn").addEventListener("click", async () => { await seedDemo(); renderSettings(); toast("Datos de ejemplo cargados"); });
+armConfirm($("#wipe"), "Toque otra vez: se borra todo menos la llave", async () => {
+  await Promise.all(STORES.map(clearStore)); S.people.clear(); S.assemblies.clear(); S.marks = []; S.incidents = []; S.seq = 0; await putKV("seq", 0);
+  stopCam(); renderSettings(); toast("Datos borrados");
+});
+
+/* ===== Datos de ejemplo (personas ficticias) ===== */
+const DEMO = [
+  ["María Elena","Tzul Batz","Sector Centro","Tejedora","1968-03-14"],["Juan Diego","Chuc Tax","Sector Norte","Carpintero","1975-07-02"],
+  ["Rosa Amalia","Ixcoy Puac","Sector Centro","Comerciante","1982-11-21"],["Pedro Pablo","Sapón Tzoc","Sector Sur","Agricultor","1959-01-30"],
+  ["Catarina","Pu Cuxil","Sector Oriente","Tejedora","1990-05-09"],["Francisco","Batz Ixcoy","Sector Norte","Albañil","1971-09-17"],
+  ["Juana Isabel","Tax Chuc","Sector Sur","Maestra","1986-12-03"],["Diego Alberto","Tzoc Sapón","Sector Oriente","Mecánico","1994-04-25"],
+  ["Magdalena","Puac Tzul","Sector Centro","Comadrona","1955-08-12"],["Manuel","Cuxil Pu","Sector Norte","Agricultor","1979-02-28"],
+  ["Ana Lucía","Chuc Sapón","Sector Sur","Enfermera","1992-10-06"],["Tomás","Ixcoy Batz","Sector Oriente","Panadero","1965-06-19"]];
+async function seedDemo(){
+  const hues = [12, 210, 140, 32, 280, 190, 330, 95, 50, 240, 170, 0];
+  const base = S.seq; const ppl = [];
+  for (let i = 0; i < DEMO.length; i++) {
+    const [n, a, s, o, b] = DEMO[i]; S.seq += 1;
+    const p = { id: `${S.cfg.prefijo}-${String(S.seq).padStart(4, "0")}`, nombres: n, apellidos: a, sector: s, oficio: o, nacimiento: b, telefono: "",
+      foto: demoAvatar(n[0] + a[0], hues[i]), ver: 1, estado: "activo", creado: Date.now(), anulados: [], ejemplo: true };
+    if (i === 5) { p.anulados = [{ver: 1, fecha: Date.now() - 86400000}]; p.ver = 2; }
+    S.people.set(p.id, p); await put("people", p); ppl.push(p);
+  }
+  await putKV("seq", S.seq);
+  if (!activeAsm()) {
+    const t0 = new Date(); t0.setHours(8, 0, 0, 0); const T = m => t0.getTime() + m * 60000;
+    const a = { id: uid(), nombre: "Asamblea de práctica", fecha: todayISO(), abierta: true, abierta_en: T(0), cerrada_en: null, ejemplo: true };
+    S.assemblies.set(a.id, a); await put("assemblies", a);
+    const add = async (pi, tipo, min) => { const m = { id: uid(), asamblea: a.id, persona: ppl[pi].id, tipo, hora: T(min), via: "carne", motivo: "", ejemplo: true }; S.marks.push(m); await put("marks", m); };
+    await add(0, "entrada", 3); await add(1, "entrada", 5); await add(2, "entrada", 6); await add(3, "entrada", 9);
+    await add(4, "entrada", 12); await add(6, "entrada", 14); await add(8, "entrada", 21);
+    await add(3, "salida", 150); await add(8, "salida", 158);
+    const inc = async (pi, tipo, detalle, min) => { const i = { id: uid(), asamblea: a.id, persona: ppl[pi].id, tipo, detalle, hora: T(min), ejemplo: true }; S.incidents.push(i); await put("incidents", i); };
+    await inc(1, "doble", "Intentó marcar entrada por segunda vez", 17);
+    await inc(5, "anulado", "Presentó el carné número 1; el vigente es el 2", 19);
+  }
+  await putKV("seeded", true);
+}
+
+/* ===== Arranque ===== */
+async function loadAll(){
+  S.people = new Map((await getAll("people") || []).map(p => [p.id, p]));
+  S.assemblies = new Map((await getAll("assemblies") || []).map(a => [a.id, a]));
+  S.marks = await getAll("marks") || []; S.incidents = await getAll("incidents") || [];
+  S.cfg = Object.assign(S.cfg, await getKV("cfg") || {}); S.seq = await getKV("seq") || 0;
+  await ensureKeys();
+}
+(async function boot(){
+  try { DB.db = await idbOpen(); } catch { DB.db = null; }
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch {}
+  await loadAll();
+  if (!S.people.size && !(await getKV("seeded"))) await seedDemo();
+  $("#asmDate").value = todayISO();
+  showTab("asamblea");
+  Sy.cfg = await getKV("sync") || null; Sy.pend = Object.assign(Sy.pend, await getKV("pend") || {});
+  setInterval(() => { if (navigator.onLine !== false) syncNow(false); }, 120000); syncNow(false);
+  window.__app = { S, Sy, evaluateQR, checkMark, commitMark, qrText, cardCanvas, sheetCanvas, seedDemo, enrollText, syncNow, mergeRemote };
+})();
+document.addEventListener("visibilitychange", () => { if (document.hidden) stopCam(); });
+/* ===== Sincronización con la base comunal (Supabase) ===== */
+const Sy = { cfg: null, pend: {people:[], assemblies:[], marks:[], incidents:[]}, busy: false, timer: null };
+function markPending(st, o){
+  if (!Sy.pend[st] || !o || o.ejemplo) return;
+  if (!Sy.pend[st].includes(o.id)) { Sy.pend[st].push(o.id); putKV("pend", Sy.pend); renderSyncPill(); }
+}
+const pendCount = () => Object.values(Sy.pend).reduce((n, a) => n + a.length, 0);
+function renderSyncPill(){
+  const el = $("#syncState"); if (!el) return;
+  const c = Sy.cfg;
+  if (!c || !c.session) { el.textContent = "Sin conectar a la base comunal"; return; }
+  const n = pendCount();
+  el.textContent = `${c.email} · ${n ? n + " cambios por enviar" : "todo enviado"}${c.last ? " · última vez " + new Date(c.last).toLocaleString("es-GT", {dateStyle:"short", timeStyle:"short"}) : ""}`;
+}
+async function api(path, opts = {}, auth = true){
+  const c = Sy.cfg, h = Object.assign({ apikey: c.anon }, opts.headers || {});
+  if (auth) h.Authorization = "Bearer " + c.session.access_token;
+  let r;
+  try { r = await fetch(c.url.replace(/\/+$/, "") + path, Object.assign({}, opts, { headers: h })); }
+  catch { throw new Error("No hay conexión con la base. Revise la señal. Si abrió la app desde Claude, la conexión está bloqueada: use la versión publicada en el dominio de la comunidad."); }
+  const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch {}
+  if (!r.ok) { const e = new Error((j && (j.message || j.msg || j.error_description || j.error)) || `Error ${r.status}`); e.status = r.status; throw e; }
+  return j;
+}
+async function login(url, anon, email, password){
+  Sy.cfg = Object.assign(Sy.cfg || {}, { url: url.trim(), anon: anon.trim(), email: email.trim() });
+  const j = await api("/auth/v1/token?grant_type=password", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ email: email.trim(), password }) }, false);
+  Sy.cfg.session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + j.expires_in * 1000 };
+  if (!Sy.cfg.device) Sy.cfg.device = uid();
+  await putKV("sync", Sy.cfg);
+}
+async function ensureSession(){
+  const s = Sy.cfg.session;
+  if (s.expires_at - Date.now() > 60000) return;
+  const j = await api("/auth/v1/token?grant_type=refresh_token", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ refresh_token: s.refresh_token }) }, false);
+  Sy.cfg.session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + j.expires_in * 1000 };
+  await putKV("sync", Sy.cfg);
+}
+const rpc = (fn, args) => api("/rest/v1/rpc/" + fn, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(args) });
+const sameJwk = (a, b) => a && b && a.x === b.x && a.y === b.y;
+async function checkKeys(com){
+  // La llave pública y el secreto del QR deben ser los mismos en todos los celulares de la comunidad
+  const rows = await api(`/rest/v1/comunidades?id=eq.${encodeURIComponent(com)}&select=llave_publica`);
+  if (!rows || !rows.length) throw new Error(`La comunidad ${com} no existe en la base. Pida al administrador que la cree.`);
+  const srv = rows[0].llave_publica, mine = S.keys.jwk.pub;
+  if (srv && !sameJwk(srv, mine)) throw new Error("Este celular firma con otra llave que la registrada en la base. Restaure aquí la copia de seguridad del celular principal y vuelva a sincronizar.");
+  if (!srv) {
+    const ADMIN = "La primera sincronización la debe hacer un administrador, desde el celular que imprime los carnés.";
+    let upd;
+    try { upd = await api(`/rest/v1/comunidades?id=eq.${encodeURIComponent(com)}`, { method:"PATCH", headers:{"Content-Type":"application/json", Prefer:"return=representation"}, body: JSON.stringify({ llave_publica: { kty: mine.kty, crv: mine.crv, x: mine.x, y: mine.y } }) }); }
+    catch (e) { throw new Error(e.status === 401 || e.status === 403 ? ADMIN : e.message); }
+    if (!Array.isArray(upd) || !upd.length) throw new Error(ADMIN);
+    try { await api("/rest/v1/comunidad_secretos?on_conflict=comunidad_id", { method:"POST", headers:{"Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body: JSON.stringify({ comunidad_id: com, hmac_qr: S.keys.jwk.master }) }); }
+    catch (e) { throw new Error(e.status === 401 || e.status === 403 ? ADMIN : e.message); }
+  } else {
+    const sec = await api(`/rest/v1/comunidad_secretos?comunidad_id=eq.${encodeURIComponent(com)}&select=hmac_qr`);
+    if (sec && sec[0] && sec[0].hmac_qr && sec[0].hmac_qr !== S.keys.jwk.master) throw new Error("El secreto del carné digital de este celular no coincide con el de la base. Restaure la copia del celular principal.");
+  }
+}
+async function uploadPhoto(com, p){
+  if (!p.foto || !p.foto.startsWith("data:")) return;
+  const blob = await (await fetch(p.foto)).blob();
+  await api(`/storage/v1/object/fotos/${encodeURIComponent(com)}/${encodeURIComponent(p.id)}.jpg`, { method:"POST", headers:{"Content-Type":"image/jpeg", "x-upsert":"true"}, body: blob });
+}
+async function downloadPhoto(path){
+  const c = Sy.cfg; const r = await fetch(c.url.replace(/\/+$/, "") + "/storage/v1/object/authenticated/fotos/" + path.split("/").map(encodeURIComponent).join("/"), { headers:{ apikey: c.anon, Authorization: "Bearer " + c.session.access_token } });
+  if (!r.ok) return "";
+  return fileToPhoto(await r.blob());
+}
+async function syncNow(manual){
+  if (Sy.busy || !Sy.cfg || !Sy.cfg.session) return;
+  Sy.busy = true; const st = $("#syncMsg"); if (manual && st) { st.hidden = false; st.className = "muted"; st.textContent = "Sincronizando…"; }
+  const com = S.cfg.prefijo;
+  try {
+    await ensureSession(); await checkKeys(com);
+    // 1) Subir lo pendiente
+    const pick = (st, all) => Sy.pend[st].map(id => all(id)).filter(Boolean);
+    const sent = JSON.parse(JSON.stringify(Sy.pend));
+    const people = pick("people", id => S.people.get(id));
+    for (const p of people) await uploadPhoto(com, p);
+    const lote = {
+      people: people.map(p => { const { foto, ...rest } = p; return rest; }),
+      assemblies: pick("assemblies", id => S.assemblies.get(id)),
+      marks: pick("marks", id => S.marks.find(m => m.id === id)),
+      incidents: pick("incidents", id => S.incidents.find(i => i.id === id)) };
+    let res = { rechazados: [], dobles: [] };
+    if (pendCount()) res = await rpc("sync_subir", { p_comunidad: com, p_dispositivo: Sy.cfg.device, p_lote: lote }) || res;
+    for (const k of Object.keys(Sy.pend)) Sy.pend[k] = Sy.pend[k].filter(id => !sent[k].includes(id));
+    await putKV("pend", Sy.pend);
+    // 2) Bajar lo de los demás celulares
+    const d = await rpc("sync_bajar", { p_comunidad: com, p_desde: Sy.cfg.cursor ?? null });
+    await mergeRemote(d);
+    for (const id of res.dobles || []) { const m = S.marks.find(x => x.id === id); if (m && m.valido !== false) { m.valido = false; await tx("marks", "readwrite", s => s.put(m)); } }
+    Sy.cfg.cursor = d.cursor; Sy.cfg.last = Date.now(); await putKV("sync", Sy.cfg);
+    const rj = (res.rechazados || []).length;
+    if (st) { st.hidden = false; st.className = rj ? "verdict warn" : "muted"; st.textContent = rj ? `Sincronizado, pero la base rechazó ${rj} registro(s): ${res.rechazados.slice(0, 3).map(r => `${r.id} (${r.motivo})`).join(", ")}` : `Sincronizado a las ${hhmm(Date.now())}.`; }
+  } catch (e) {
+    if (e.status === 401 || e.status === 400 && /refresh/i.test(e.message)) { Sy.cfg.session = null; await putKV("sync", Sy.cfg); }
+    if (st) { st.hidden = false; st.className = "verdict bad"; st.textContent = e.message; }
+  } finally { Sy.busy = false; renderSyncPill(); if (S.tab !== "ajustes") { ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport})[S.tab](); } }
+}
+async function mergeRemote(d){
+  const raw = (st, o) => tx(st, "readwrite", s => s.put(o));
+  for (const r of d.people || []) {
+    if (Sy.pend.people.includes(r.id)) continue;
+    const l = S.people.get(r.id);
+    if (l && l.ver > r.ver) continue;
+    const p = Object.assign(l || { ejemplo: false }, { id: r.id, nombres: r.nombres, apellidos: r.apellidos, nacimiento: r.nacimiento || "", sector: r.sector || "", oficio: r.oficio || "", telefono: r.telefono || "", ver: r.ver, estado: r.estado, anulados: r.anulados || [], creado: r.creado, foto_path: r.foto_path });
+    if (r.foto_path && (!l || !l.foto || (l.foto_path && l.foto_path !== r.foto_path) || (r.actualizado && r.actualizado > (l.bajada || 0)))) {
+      const f = await downloadPhoto(r.foto_path); if (f) { p.foto = f; p.bajada = Date.now(); }
+    }
+    if (!p.foto) p.foto = demoAvatar("?", 220);
+    S.people.set(p.id, p); await raw("people", p);
+    const n = parseInt(String(r.id).split("-")[1], 10); if (n > S.seq) { S.seq = n; await putKV("seq", S.seq); }
+  }
+  for (const r of d.assemblies || []) {
+    if (Sy.pend.assemblies.includes(r.id)) continue;
+    const a = Object.assign(S.assemblies.get(r.id) || { ejemplo: false }, r);
+    S.assemblies.set(a.id, a); await raw("assemblies", a);
+  }
+  for (const r of d.marks || []) {
+    const i = S.marks.findIndex(m => m.id === r.id), m = Object.assign(i >= 0 ? S.marks[i] : { ejemplo: false }, r);
+    if (i < 0) S.marks.push(m); await raw("marks", m);
+  }
+  for (const r of d.incidents || []) {
+    const i = S.incidents.findIndex(x => x.id === r.id), x = Object.assign(i >= 0 ? S.incidents[i] : { ejemplo: false }, r);
+    if (i < 0) S.incidents.push(x); await raw("incidents", x);
+  }
+}
+function renderSyncCard(){
+  const c = Sy.cfg || {}, on = !!(c.session);
+  $("#syncLogin").hidden = on; $("#syncOn").hidden = !on;
+  $("#syUrl").value = c.url || ""; $("#syAnon").value = c.anon || ""; $("#syMail").value = c.email || "";
+  renderSyncPill();
+}
+$("#syncLogin").addEventListener("submit", async e => {
+  e.preventDefault(); const m = $("#syncMsg"); m.hidden = false; m.className = "muted"; m.textContent = "Entrando…";
+  try { await login($("#syUrl").value, $("#syAnon").value, $("#syMail").value, $("#syPass").value); $("#syPass").value = ""; m.textContent = "Listo. Sincronizando…"; renderSyncCard(); await syncNow(true); }
+  catch (er) { m.className = "verdict bad"; m.textContent = /invalid/i.test(er.message) ? "Correo o contraseña incorrectos." : er.message; }
+});
+$("#syncBtn").addEventListener("click", () => syncNow(true));
+armConfirm($("#syncOut"), "Toque otra vez para salir", async () => { Sy.cfg.session = null; await putKV("sync", Sy.cfg); renderSyncCard(); });
+window.addEventListener("online", () => syncNow(false));
+
+</script>

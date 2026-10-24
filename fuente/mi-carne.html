@@ -1,0 +1,156 @@
+<title>Mi Carné Comunal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#2f3a8f">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@500&display=swap">
+<style>
+/* Layout: una tarjeta centrada que ocupa la pantalla del celular; el QR es el protagonista */
+:root{
+  --bg:#f2f3f8; --surface:#ffffff; --sunk:#e8eaf3; --ink:#1b1f3b; --muted:#5a5f80; --line:#d9dcea;
+  --indigo:#2f3a8f; --indigo-ink:#ffffff; --terra:#b5532f; --ok:#1d7a4c; --ok-bg:#e3f4ea; --bad:#b3261e; --bad-bg:#fbe5e3;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"Atkinson Hyperlegible Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font:16px/1.45 var(--f-body)}
+.wrap{max-width:440px;margin:0 auto;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+h1{font-size:24px;margin:0;text-wrap:balance}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:grid}
+.band{background:var(--indigo);color:var(--indigo-ink);padding:14px 18px}
+.band b{display:block;font-size:19px}
+.band span{font-size:14px;opacity:.9}
+.body{padding:18px;display:grid;gap:14px;justify-items:center;text-align:center}
+.name{font-size:24px;font-weight:700;line-height:1.2;text-wrap:balance}
+.code{font-family:var(--f-mono);letter-spacing:.03em}
+.qr{width:100%;max-width:300px;aspect-ratio:1;background:#fff;border-radius:12px;padding:8px}
+.qr canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.bar{width:100%;max-width:300px;height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);transform-origin:left;width:100%}
+.clock{font-family:var(--f-mono);font-size:30px;font-variant-numeric:tabular-nums;color:var(--ok)}
+.strip{height:10px;background:var(--terra)}
+button,.btn{font:inherit;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:12px 16px;min-height:48px;cursor:pointer;width:100%;display:inline-flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+button.primary{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo)}
+button.armed{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+textarea{font:14px var(--f-mono);width:100%;min-height:110px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px}
+:focus-visible{outline:3px solid var(--terra);outline-offset:2px}
+.msg{border-radius:12px;padding:12px;font-weight:700}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+.foot{font-size:13px;color:var(--muted);text-align:center}
+.foot a{color:var(--indigo)}
+ol{margin:0;padding-left:20px;display:grid;gap:6px}
+</style>
+
+<div class="wrap">
+  <section id="setup" hidden>
+    <div style="display:grid;gap:14px">
+      <h1>Activar mi carné en el celular</h1>
+      <ol class="muted">
+        <li>Pida en la alcaldía comunal el código de activación de su carné.</li>
+        <li>Tómele foto con el botón de abajo, o pegue el texto si se lo enviaron por mensaje.</li>
+      </ol>
+      <span class="btn">Fotografiar código<input type="file" accept="image/*" capture="environment" id="snap" aria-label="Fotografiar código"></span>
+      <label class="muted" for="paste" style="font-weight:700">O pegue el código aquí</label>
+      <textarea id="paste" placeholder="CCE1|PXT-0001|…"></textarea>
+      <button class="primary" type="button" id="activate">Activar</button>
+      <p class="msg bad" id="err" hidden></p>
+    </div>
+  </section>
+
+  <section id="live" hidden>
+    <div class="card">
+      <div class="band"><b id="com"></b><span>Carné comunal digital</span></div>
+      <div class="body">
+        <div class="name" id="name"></div>
+        <div class="code" id="pid"></div>
+        <div class="qr"><canvas id="qr" width="330" height="330" aria-label="Código QR del carné"></canvas></div>
+        <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+        <div class="clock" id="clock" aria-live="off"></div>
+        <p class="muted">El código cambia cada 30 segundos. Una captura de pantalla no sirve: muéstrelo en vivo.</p>
+      </div>
+      <div class="strip"></div>
+    </div>
+    <p class="muted" id="ver" style="text-align:center"></p>
+    <p class="msg bad" id="noStore" hidden>Este navegador no guardó el carné. Si cierra la página tendrá que activarlo otra vez.</p>
+    <button type="button" id="remove">Quitar el carné de este celular</button>
+  </section>
+
+  <p class="foot">Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+</div>
+<canvas id="work" hidden></canvas>
+
+<script>/*LIBS*/</script>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const STEP = 30, KEY = "mi-carne-comunal";
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64u = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
+let C = null, hkey = null, lastStep = -1;
+
+function parse(t){
+  const p = String(t || "").trim().split("|");
+  if (p.length !== 6 || p[0] !== "CCE1") return null;
+  try { if (unb64u(p[5]).length !== 32) return null; } catch { return null; }
+  return { id: p[1], ver: p[2], nombre: p[3], comunidad: p[4], secret: p[5] };
+}
+async function start(c){
+  C = c;
+  hkey = await crypto.subtle.importKey("raw", unb64u(c.secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  $("#com").textContent = c.comunidad; $("#name").textContent = c.nombre; $("#pid").textContent = c.id;
+  $("#ver").textContent = `Carné número ${c.ver}`;
+  $("#setup").hidden = true; $("#live").hidden = false; lastStep = -1; tick();
+  try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch {}
+}
+async function tick(){
+  if (!C) return;
+  const now = Date.now(), step = Math.floor(now / 1000 / STEP), left = STEP - (now / 1000) % STEP;
+  if (step !== lastStep) {
+    lastStep = step;
+    const sig = new Uint8Array(await crypto.subtle.sign("HMAC", hkey, new TextEncoder().encode(`${C.id}|${C.ver}|${step}`)));
+    const q = qrcode(0, "M"); q.addData(`CC2|${C.id}|${C.ver}|${step}|${b64u(sig.slice(0, 12))}`); q.make();
+    const cv = $("#qr"), g = cv.getContext("2d"), n = q.getModuleCount(), cell = Math.floor(cv.width / (n + 4)), off = Math.floor((cv.width - cell * n) / 2);
+    g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = "#000";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(off + c * cell, off + r * cell, cell, cell);
+  }
+  $("#bar").style.transform = `scaleX(${left / STEP})`;
+  $("#clock").textContent = new Date(now).toLocaleTimeString("es-GT", {hour12:false});
+  setTimeout(tick, 250);
+}
+async function activate(text){
+  const c = parse(text), err = $("#err");
+  if (!c) { err.textContent = "Ese no es un código de activación válido. Revise que esté completo."; err.hidden = false; return; }
+  err.hidden = true;
+  let saved = false; try { localStorage.setItem(KEY, String(text).trim()); saved = localStorage.getItem(KEY) !== null; } catch {}
+  $("#noStore").hidden = saved;
+  start(c);
+}
+function loadImg(src){ return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+$("#snap").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const url = URL.createObjectURL(f);
+  try {
+    const img = await loadImg(url), cv = $("#work"), s = Math.min(1, 1000 / Math.max(img.naturalWidth, img.naturalHeight));
+    cv.width = Math.round(img.naturalWidth * s); cv.height = Math.round(img.naturalHeight * s);
+    const g = cv.getContext("2d", {willReadFrequently:true}); g.drawImage(img, 0, 0, cv.width, cv.height);
+    const r = jsQR(g.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, {inversionAttempts:"attemptBoth"});
+    if (r) activate(r.data); else { $("#err").textContent = "No se pudo leer el código. Acerque el celular y tome otra foto."; $("#err").hidden = false; }
+  } finally { URL.revokeObjectURL(url); }
+});
+$("#activate").addEventListener("click", () => activate($("#paste").value));
+$("#remove").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (!b.classList.contains("armed")) { b.dataset.o = b.textContent; b.textContent = "Toque otra vez para quitarlo"; b.classList.add("armed"); setTimeout(() => { b.classList.remove("armed"); b.textContent = b.dataset.o; }, 4000); return; }
+  try { localStorage.removeItem(KEY); } catch {}
+  C = null; $("#live").hidden = true; $("#setup").hidden = false; b.classList.remove("armed"); b.textContent = b.dataset.o;
+});
+document.addEventListener("visibilitychange", async () => { if (!document.hidden && C) { try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch {} } });
+(function boot(){
+  let c = null; try { c = parse(localStorage.getItem(KEY)); } catch {}
+  if (c) start(c); else $("#setup").hidden = false;
+})();
+</script>
