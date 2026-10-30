@@ -3,18 +3,18 @@
 <meta name="theme-color" content="#2f3a8f">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@500&display=swap">
 <style>
-/* Layout: una tarjeta centrada que ocupa la pantalla del celular; el QR es el protagonista */
+/* Layout: app de una columna con tres pestañas abajo (carné, asistencia, multas); el QR es el protagonista */
 :root{
   --bg:#f2f3f8; --surface:#ffffff; --sunk:#e8eaf3; --ink:#1b1f3b; --muted:#5a5f80; --line:#d9dcea;
-  --indigo:#2f3a8f; --indigo-ink:#ffffff; --terra:#b5532f; --ok:#1d7a4c; --ok-bg:#e3f4ea; --bad:#b3261e; --bad-bg:#fbe5e3;
+  --indigo:#2f3a8f; --indigo-ink:#ffffff; --terra:#b5532f; --ok:#1d7a4c; --ok-bg:#e3f4ea; --bad:#b3261e; --bad-bg:#fbe5e3; --warn:#9a6200; --warn-bg:#fdf1d8;
   --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"Atkinson Hyperlegible Mono",ui-monospace,Menlo,Consolas,monospace;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;color-scheme:dark}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;--warn:#f1b84a;--warn-bg:#3a2d10;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11132a;--surface:#1a1d3a;--sunk:#232750;--ink:#eceefa;--muted:#a4a9ca;--line:#2e3360;--indigo:#8e9bff;--indigo-ink:#11132a;--terra:#e3906b;--ok:#62cf94;--ok-bg:#16352a;--bad:#ff8c82;--bad-bg:#40191a;--warn:#f1b84a;--warn-bg:#3a2d10;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
-body{color:var(--ink);font:16px/1.45 var(--f-body)}
+body{color:var(--ink);font:16px/1.45 var(--f-body);padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:440px;margin:0 auto;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
 h1{font-size:24px;margin:0;text-wrap:balance}
 p{margin:0}
@@ -43,12 +43,39 @@ textarea{font:14px var(--f-mono);width:100%;min-height:110px;border-radius:12px;
 .foot{font-size:13px;color:var(--muted);text-align:center}
 .foot a{color:var(--indigo)}
 ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.item{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.item .grow{flex:1;min-width:0}
+.item b{display:block}
+.item small{color:var(--muted);font-size:13px}
+.list{display:grid;gap:8px}
+.list > *{min-width:0}
+.tag{font-size:12px;font-weight:700;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.tag.in{background:var(--ok-bg);color:var(--ok)} .tag.bad{background:var(--bad-bg);color:var(--bad)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.neutral{background:var(--sunk);color:var(--muted)}
+.money{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.total{border-radius:16px;padding:16px;display:grid;gap:4px}
+.total.bad{background:var(--bad-bg);color:var(--bad)} .total.ok{background:var(--ok-bg);color:var(--ok)}
+.total b{font-size:30px;font-family:var(--f-mono)}
+.total p{color:var(--ink)}
+h2{font-size:20px;margin:0}
+.demo{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.demo button{min-height:56px;font-size:15px;justify-content:flex-start;text-align:left}
+.badge{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--warn-bg);color:var(--warn);justify-self:center}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:440px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+nav.tabs button{border:0;border-radius:0;background:transparent;min-height:64px;flex-direction:column;gap:2px;font-size:13px;color:var(--muted);padding:6px 4px;width:auto}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-current="page"]{color:var(--indigo)}
 </style>
 
 <div class="wrap">
   <section id="setup" hidden>
     <div style="display:grid;gap:14px">
-      <h1>Activar mi carné en el celular</h1>
+      <h1>Mi carné comunal</h1>
+      <p class="muted">Su carné en el celular, su asistencia a asambleas y faenas, y sus multas.</p>
+      <h2>Probar con un morador de ejemplo</h2>
+      <p class="muted">Personas ficticias de la demostración. Son las mismas que trae la app de control.</p>
+      <div class="demo" id="demoList"></div>
+      <h2 style="margin-top:8px">Activar mi carné real</h2>
       <ol class="muted">
         <li>Pida en la alcaldía comunal el código de activación de su carné.</li>
         <li>Tómele foto con el botón de abajo, o pegue el texto si se lo enviaron por mensaje.</li>
@@ -61,10 +88,11 @@ ol{margin:0;padding-left:20px;display:grid;gap:6px}
     </div>
   </section>
 
-  <section id="live" hidden>
+  <section id="t-carne" hidden>
     <div class="card">
       <div class="band"><b id="com"></b><span>Carné comunal digital</span></div>
       <div class="body">
+        <span class="badge" id="demoBadge" hidden>Morador de ejemplo</span>
         <div class="name" id="name"></div>
         <div class="code" id="pid"></div>
         <div class="qr"><canvas id="qr" width="330" height="330" aria-label="Código QR del carné"></canvas></div>
@@ -79,32 +107,93 @@ ol{margin:0;padding-left:20px;display:grid;gap:6px}
     <button type="button" id="remove">Quitar el carné de este celular</button>
   </section>
 
-  <p class="foot">Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+  <section id="t-asis" class="list" style="gap:14px" hidden>
+    <h1>Mi asistencia</h1>
+    <div id="asisBody" class="list"></div>
+  </section>
+
+  <section id="t-mul" class="list" style="gap:14px" hidden>
+    <h1>Mis multas</h1>
+    <div id="mulBody" class="list" style="gap:14px"></div>
+  </section>
+
+  <p class="foot">Versión demo 1.3 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
 </div>
+<nav class="tabs" id="tabs" aria-label="Secciones" hidden><div class="in">
+  <button type="button" data-t="carne" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M21 14v7h-7"/></svg>Mi carné</button>
+  <button type="button" data-t="asis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2.5 2.5L16 12"/></svg>Asistencia</button>
+  <button type="button" data-t="mul"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Multas</button>
+</div></nav>
 <canvas id="work" hidden></canvas>
 
 <script>/*LIBS*/</script>
+<script>/*COMUN*/</script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const STEP = 30, KEY = "mi-carne-comunal";
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const unb64u = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
-let C = null, hkey = null, lastStep = -1;
+const hhmm = t => new Date(t).toLocaleTimeString("es-GT", {hour:"2-digit", minute:"2-digit", hour12:false});
+const fecha = d => new Date(d + "T12:00:00").toLocaleDateString("es-GT", {day:"numeric", month:"long", year:"numeric"});
+const TIPO = { asamblea:"Asamblea", faena:"Faena", reunion:"Reunión" };
+let C = null, hkey = null, lastStep = -1, tab = "carne";
 
 function parse(t){
-  const p = String(t || "").trim().split("|");
+  const s = String(t || "").trim();
+  if (s.startsWith("DEMO|")) { const id = s.slice(5), p = demoConstruir("PXT").people.find(x => x.id === id); return p ? { demo: true, id: p.id, ver: String(p.ver), nombre: `${p.nombres} ${p.apellidos}`, comunidad: "Comunidad de Paxtocá" } : null; }
+  const p = s.split("|");
   if (p.length !== 6 || p[0] !== "CCE1") return null;
   try { if (unb64u(p[5]).length !== 32) return null; } catch { return null; }
   return { id: p[1], ver: p[2], nombre: p[3], comunidad: p[4], secret: p[5] };
 }
+async function secretOf(c){
+  if (!c.demo) return unb64u(c.secret);
+  const k = await crypto.subtle.importKey("raw", unb64u(DEMO_MASTER), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(`${c.id}|${c.ver}`)));
+}
 async function start(c){
   C = c;
-  hkey = await crypto.subtle.importKey("raw", unb64u(c.secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  hkey = await crypto.subtle.importKey("raw", await secretOf(c), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
   $("#com").textContent = c.comunidad; $("#name").textContent = c.nombre; $("#pid").textContent = c.id;
-  $("#ver").textContent = `Carné número ${c.ver}`;
-  $("#setup").hidden = true; $("#live").hidden = false; lastStep = -1; tick();
+  $("#ver").textContent = `Carné número ${c.ver}`; $("#demoBadge").hidden = !c.demo;
+  $("#setup").hidden = true; $("#tabs").hidden = false; lastStep = -1; show("carne"); tick();
   try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch {}
+}
+function show(t){
+  tab = t;
+  document.querySelectorAll("#tabs button").forEach(b => { if (b.dataset.t === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  ["carne","asis","mul"].forEach(n => $("#t-" + n).hidden = n !== t);
+  if (t === "asis") renderAsis(); if (t === "mul") renderMul();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.t)));
+/* Datos del morador: en la demo salen del conjunto de ejemplo; con la base comunal vendrán del servidor */
+function misDatos(){
+  if (!C.demo) return null;
+  const d = demoConstruir("PXT");
+  return { d, marks: d.marks.filter(m => m.persona === C.id), multas: d.multas.filter(m => m.persona === C.id).sort((a, b) => b.creada - a.creada) };
+}
+const sinBase = `<p class="muted">Su asistencia y sus multas aparecerán aquí cuando la comunidad conecte la base comunal. Mientras tanto, consulte en la alcaldía comunal.</p>`;
+function renderAsis(){
+  const x = misDatos(); if (!x) { $("#asisBody").innerHTML = sinBase; return; }
+  const evs = x.d.assemblies.slice().sort((a, b) => b.fecha.localeCompare(a.fecha));
+  $("#asisBody").innerHTML = evs.map(a => {
+    const st = situacion(a, x.marks.filter(m => m.asamblea === a.id));
+    const tag = st.estado === "ausente" ? `<span class="tag bad">No asistió</span>` : st.estado === "sin_salida" ? `<span class="tag warn">Sin salida</span>` : st.estado === "dentro" ? `<span class="tag in">Dentro ahora</span>` : `<span class="tag in">Completa</span>`;
+    return `<div class="item"><div class="grow"><b>${esc(TIPO[a.tipo] || "Asamblea")}: ${esc(a.nombre)}</b><small>${esc(fecha(a.fecha))} · inicia ${esc(a.inicio)}${st.e ? ` · entró ${hhmm(st.e.hora)}` : ""}${st.s ? `, salió ${hhmm(st.s.hora)}` : ""}</small></div>
+      <div style="display:grid;gap:4px;justify-items:end">${tag}${st.tarde ? `<span class="tag warn">${st.minTarde} min tarde</span>` : ""}</div></div>`; }).join("");
+}
+function renderMul(){
+  const x = misDatos(); if (!x) { $("#mulBody").innerHTML = sinBase; return; }
+  const nombre = c => (INFRACCIONES_BASE.find(i => i.codigo === c) || {}).nombre || c;
+  const pend = x.multas.filter(m => m.estado === "pendiente"), total = pend.reduce((n, m) => n + m.monto, 0);
+  const cls = { pendiente:"bad", pagada:"in", condonada:"neutral", anulada:"neutral" };
+  $("#mulBody").innerHTML = (total ? `<div class="total bad"><span>Usted debe</span><b>${quetzales(total)}</b><p>${pend.length} multa${pend.length > 1 ? "s" : ""} pendiente${pend.length > 1 ? "s" : ""}. Pague en la alcaldía comunal; ahí le entregan su recibo.</p></div>`
+      : `<div class="total ok"><span>Está solvente</span><b>${quetzales(0)}</b><p>No tiene multas pendientes.</p></div>`)
+    + (x.multas.length ? `<div class="list">${x.multas.map(m => `<div class="item"><div class="grow"><b>${esc(nombre(m.motivo))}</b><small>${esc(m.descripcion)}${m.estado === "pagada" ? ` · recibo ${esc(m.recibo)}, ${new Date(m.pagada_en).toLocaleDateString("es-GT")}` : ""}${m.nota ? ` · ${esc(m.nota)}` : ""}</small></div>
+        <div style="display:grid;gap:4px;justify-items:end"><span class="money">${quetzales(m.monto)}</span><span class="tag ${cls[m.estado]}">${ESTADO_MULTA[m.estado]}</span></div></div>`).join("")}</div>` : `<p class="muted">No tiene multas registradas.</p>`);
 }
 async function tick(){
   if (!C) return;
@@ -142,11 +231,13 @@ $("#snap").addEventListener("change", async e => {
   } finally { URL.revokeObjectURL(url); }
 });
 $("#activate").addEventListener("click", () => activate($("#paste").value));
+$("#demoList").innerHTML = demoConstruir("PXT").people.map(p => `<button type="button" data-id="${p.id}">${esc(p.nombres)} ${esc(p.apellidos.split(" ")[0])}</button>`).join("");
+$("#demoList").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b) activate("DEMO|" + b.dataset.id); });
 $("#remove").addEventListener("click", e => {
   const b = e.currentTarget;
   if (!b.classList.contains("armed")) { b.dataset.o = b.textContent; b.textContent = "Toque otra vez para quitarlo"; b.classList.add("armed"); setTimeout(() => { b.classList.remove("armed"); b.textContent = b.dataset.o; }, 4000); return; }
   try { localStorage.removeItem(KEY); } catch {}
-  C = null; $("#live").hidden = true; $("#setup").hidden = false; b.classList.remove("armed"); b.textContent = b.dataset.o;
+  C = null; ["carne","asis","mul"].forEach(n => $("#t-" + n).hidden = true); $("#tabs").hidden = true; $("#setup").hidden = false; b.classList.remove("armed"); b.textContent = b.dataset.o;
 });
 document.addEventListener("visibilitychange", async () => { if (!document.hidden && C) { try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch {} } });
 (function boot(){

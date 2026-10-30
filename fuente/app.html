@@ -66,6 +66,7 @@ input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid
 .stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
 .stat span{font-size:12px;color:var(--muted);display:block;line-height:1.25}
 .stat.alert b{color:var(--bad)}
+.stat b.money{font-size:16px;line-height:1.5}
 @media (max-width:380px){.stats{grid-template-columns:repeat(2,1fr)}}
 .viewer{position:relative;background:#000;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;max-width:100%;display:grid;place-items:center}
 .viewer video{width:100%;height:100%;object-fit:cover}
@@ -86,8 +87,8 @@ input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid
 .tag.warn{background:var(--warn-bg);color:var(--warn)}
 .tag.neutral{background:var(--sunk);color:var(--muted)}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-nav.tabs .in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav.tabs button{border:0;border-radius:0;background:transparent;min-height:var(--nav-h);flex-direction:column;gap:2px;font-size:13px;color:var(--muted);padding:6px 4px}
+nav.tabs .in{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{border:0;border-radius:0;background:transparent;min-height:var(--nav-h);flex-direction:column;gap:2px;font-size:12px;color:var(--muted);padding:6px 4px}
 nav.tabs button svg{width:24px;height:24px}
 nav.tabs button[aria-current="page"]{color:var(--indigo)}
 .sheet{position:fixed;inset:0;z-index:20;background:rgb(10 12 30 / .55);display:flex;align-items:flex-end;justify-content:center}
@@ -109,6 +110,10 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
 th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
 th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--sunk)}
 td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{min-height:40px;padding:6px 14px;border-radius:999px;font-size:14px}
+.chips button[aria-pressed="true"]{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo)}
+.money{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
 .foot{font-size:13px;color:var(--muted);text-align:center;padding-block:8px}
 .foot a{color:var(--indigo)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 12px);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;max-width:calc(100% - 32px)}
@@ -138,6 +143,8 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
         <label>Tipo<select id="asmTipo"><option value="asamblea">Asamblea</option><option value="faena">Faena</option><option value="reunion">Reunión</option></select></label>
         <label>Nombre<input id="asmName" required value="Asamblea general"></label>
         <label>Fecha<input id="asmDate" type="date" required></label>
+        <label>Hora de inicio<input id="asmIni" type="time" value="08:00" required></label>
+        <label>Minutos de tolerancia<input id="asmTol" type="number" inputmode="numeric" min="0" max="120" value="15" required></label>
         <button class="primary block" type="submit" style="grid-column:1/-1">Abrir asamblea</button>
       </form>
     </div>
@@ -197,6 +204,19 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
     <div id="repBody" class="list" style="gap:16px"></div>
   </section>
 
+  <!-- MULTAS -->
+  <section id="v-multas" class="list" style="gap:16px" hidden>
+    <div class="row">
+      <div class="grow"><h2>Multas</h2><p class="muted">Asignar, cobrar y llevar la solvencia de cada morador.</p></div>
+      <button class="primary" type="button" id="mulNew">Nueva multa</button>
+    </div>
+    <div class="stats" id="mulStats"></div>
+    <div class="chips" id="mulChips" role="group" aria-label="Filtrar por estado"></div>
+    <input id="mulSearch" type="search" placeholder="Buscar por nombre o código" aria-label="Buscar multa">
+    <div id="mulList" class="list"></div>
+    <button type="button" class="block" id="mulCat">Infracciones y montos</button>
+  </section>
+
   <!-- AJUSTES -->
   <section id="v-ajustes" class="list" style="gap:16px" hidden>
     <h2>Ajustes</h2>
@@ -247,7 +267,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
       <p class="muted">Cada código QR va firmado con la llave de esta comunidad. Un carné copiado a mano, alterado o reemplazado se rechaza al escanearlo. Huella de la llave: <span class="code" id="keyFp"></span></p>
       <button type="button" class="danger" id="wipe">Borrar todos los datos</button>
     </div>
-    <p class="foot">Versión piloto 1.2 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+    <p class="foot">Versión demo 1.3 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
   </section>
 </main></div>
 
@@ -255,6 +275,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
   <button type="button" data-tab="asamblea" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>Asamblea</button>
   <button type="button" data-tab="moradores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3.5 3.5 0 0 1 0 7M21 20c0-2.6-1.6-4.8-4-5.6"/></svg>Moradores</button>
   <button type="button" data-tab="reporte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reporte</button>
+  <button type="button" data-tab="multas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Multas</button>
   <button type="button" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</button>
 </div></nav>
 
@@ -263,6 +284,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
 <canvas id="work" hidden></canvas>
 
 <script>/*LIBS*/</script>
+<script>/*COMUN*/</script>
 <script>
 "use strict";
 /* ===== Utilidades ===== */
@@ -285,12 +307,12 @@ function armConfirm(btn, label, fn){
 }
 
 /* ===== Almacenamiento (IndexedDB en este celular) ===== */
-const STORES = ["people", "assemblies", "marks", "incidents"];
+const STORES = ["people", "assemblies", "marks", "incidents", "multas"];
 const DB = { db: null };
 function idbOpen(){
   return new Promise((res, rej) => {
-    let r; try { r = indexedDB.open("carne-comunal", 1); } catch (e) { return rej(e); }
-    r.onupgradeneeded = () => { const d = r.result; STORES.forEach(n => d.createObjectStore(n, {keyPath:"id"})); d.createObjectStore("kv"); };
+    let r; try { r = indexedDB.open("carne-comunal", 2); } catch (e) { return rej(e); }
+    r.onupgradeneeded = () => { const d = r.result; STORES.forEach(n => { if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, {keyPath:"id"}); }); if (!d.objectStoreNames.contains("kv")) d.createObjectStore("kv"); };
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   });
 }
@@ -309,7 +331,7 @@ const putKV = (k, v) => tx("kv", "readwrite", s => s.put(v, k));
 const clearStore = st => tx(st, "readwrite", s => s.clear());
 
 /* ===== Estado ===== */
-const S = { people: new Map(), assemblies: new Map(), marks: [], incidents: [], cfg: {comunidad:"Comunidad de Paxtocá", lugar:"Totonicapán", prefijo:"PXT"}, seq: 0, keys: null, mode: "entrada", tab: "asamblea" };
+const S = { people: new Map(), assemblies: new Map(), marks: [], incidents: [], multas: [], infr: INFRACCIONES_BASE.map(i => ({...i})), recibo: 0, mulFiltro: "pendiente", cfg: {comunidad:"Comunidad de Paxtocá", lugar:"Totonicapán", prefijo:"PXT"}, seq: 0, keys: null, mode: "entrada", tab: "asamblea" };
 const activeAsm = () => [...S.assemblies.values()].find(a => a.abierta) || null;
 const marksOf = (aid, pid) => S.marks.filter(m => m.asamblea === aid && m.valido !== false && (!pid || m.persona === pid));
 
@@ -346,7 +368,7 @@ async function hmac(keyBytes, msg){
   const k = await crypto.subtle.importKey("raw", keyBytes, HM, false, ["sign"]);
   return new Uint8Array(await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg)));
 }
-const personSecret = p => hmac(unb64u(S.keys.jwk.master), `${p.id}|${p.ver}`);
+const personSecret = p => hmac(unb64u(p.ejemplo ? DEMO_MASTER : S.keys.jwk.master), `${p.id}|${p.ver}`);
 async function enrollText(p){
   return `CCE1|${p.id}|${p.ver}|${fullName(p)}|${S.cfg.comunidad}|${b64u(await personSecret(p))}`;
 }
@@ -541,9 +563,9 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet
 function showTab(t){
   S.tab = t;
   document.querySelectorAll("nav.tabs button").forEach(b => { if (b.dataset.tab === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-  ["asamblea","moradores","reporte","ajustes"].forEach(n => $("#v-" + n).hidden = n !== t);
+  ["asamblea","moradores","reporte","multas","ajustes"].forEach(n => $("#v-" + n).hidden = n !== t);
   if (t !== "asamblea") stopCam();
-  ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport, ajustes: renderSettings})[t]();
+  ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport, multas: renderMultas, ajustes: renderSettings})[t]();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
@@ -571,7 +593,7 @@ function renderAsm(){
   const a = activeAsm();
   $("#asmNone").hidden = !!a; $("#asmLive").hidden = !a;
   if (!a) { if (!$("#asmDate").value) $("#asmDate").value = todayISO(); stopCam(); return; }
-  $("#asmTitle").textContent = a.nombre; $("#asmMeta").textContent = `${TIPO[a.tipo] || "Asamblea"} · ${fecha(a.fecha)} · abierta a las ${hhmm(a.abierta_en)}`;
+  $("#asmTitle").textContent = a.nombre; $("#asmMeta").textContent = `${TIPO[a.tipo] || "Asamblea"} · ${fecha(a.fecha)}${a.inicio ? ` · inicia ${a.inicio}, tolerancia ${a.tolerancia || 0} min` : ""} · abierta a las ${hhmm(a.abierta_en)}`;
   refreshStats();
   ["modeIn","modeOut"].forEach(id => { const b = $("#" + id); b.setAttribute("aria-pressed", String(b.dataset.mode === S.mode)); });
   const ms = marksOf(a.id).slice().sort((x, y) => y.hora - x.hora).slice(0, 8);
@@ -581,7 +603,7 @@ function renderAsm(){
 }
 $("#asmForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const a = { id: uid(), tipo: $("#asmTipo").value, nombre: $("#asmName").value.trim() || "Asamblea", fecha: $("#asmDate").value || todayISO(), abierta: true, abierta_en: Date.now(), cerrada_en: null, ejemplo: false };
+  const a = { id: uid(), tipo: $("#asmTipo").value, nombre: $("#asmName").value.trim() || "Asamblea", fecha: $("#asmDate").value || todayISO(), inicio: $("#asmIni").value || "08:00", tolerancia: +$("#asmTol").value || 0, abierta: true, abierta_en: Date.now(), cerrada_en: null, ejemplo: false };
   S.assemblies.set(a.id, a); await put("assemblies", a); S.mode = "entrada"; renderAsm(); toast("Asamblea abierta");
 });
 armConfirm($("#closeAsm"), "Toque otra vez para cerrar", async () => {
@@ -700,12 +722,14 @@ $("#sheetPages").addEventListener("click", async e => {
 async function personDetail(id){
   const p = S.people.get(id);
   openSheet(`${whoBlock(p)}
+    ${solvenciaBlock(p.id)}
     <img class="cardimg" id="dCard" alt="Vista del carné de ${esc(fullName(p))}">
     <p class="muted">${esc(p.oficio || "Sin oficio anotado")}${p.telefono ? " · Tel. " + esc(p.telefono) : ""}${p.anulados && p.anulados.length ? ` · Carnés anulados: ${p.anulados.map(a => "nº " + a.ver).join(", ")}` : ""}</p>
     <div class="grid2">
       <button type="button" class="primary" id="dDown" ${p.estado !== "activo" ? "disabled" : ""}>Descargar carné</button>
       <button type="button" id="dEdit">Editar datos</button>
       <button type="button" id="dDig" ${p.estado !== "activo" ? "disabled" : ""}>Carné en el celular</button>
+      <button type="button" id="dMul">Ponerle una multa</button>
       <button type="button" class="danger" id="dRe" ${p.estado !== "activo" ? "disabled" : ""}>Reponer carné (anula el actual)</button>
       <button type="button" class="danger" id="dBaja">${p.estado === "activo" ? "Dar de baja" : "Reactivar"}</button>
     </div>
@@ -715,6 +739,7 @@ async function personDetail(id){
   $("#dDown").addEventListener("click", async () => saveFile(`carne-${p.id}-${p.ver}.png`, await canvasBlob(await cardCanvas(p))));
   $("#dEdit").addEventListener("click", () => personForm(p));
   $("#dDig").addEventListener("click", () => digitalEnroll(p));
+  $("#dMul").addEventListener("click", () => nuevaMulta(p.id));
   armConfirm($("#dRe"), "Toque otra vez: el carné actual dejará de valer", async () => {
     p.anulados = [...(p.anulados || []), {ver: p.ver, fecha: Date.now()}]; p.ver += 1; await put("people", p);
     toast(`Carné número ${p.ver} emitido. El anterior ya no vale.`); personDetail(p.id); renderPeople();
@@ -784,7 +809,8 @@ function reportRows(a){
     const ms = marksOf(a.id, p.id), e = ms.find(m => m.tipo === "entrada"), s = ms.find(m => m.tipo === "salida");
     let est = "Ausente", cls = "bad";
     if (e && s) { est = "Completa"; cls = "in"; } else if (e) { est = a.abierta ? "Dentro" : "Sin salida"; cls = a.abierta ? "in" : "warn"; }
-    return { p, e, s, est, cls, min: e && s ? Math.round((s.hora - e.hora) / 60000) : null, manual: ms.some(m => m.via === "manual") };
+    const st = situacion(a, ms);
+    return { p, e, s, est, cls, tarde: st.tarde, minTarde: st.minTarde, min: e && s ? Math.round((s.hora - e.hora) / 60000) : null, manual: ms.some(m => m.via === "manual") };
   });
 }
 const TIPO = { asamblea:"Asamblea", faena:"Faena", reunion:"Reunión" };
@@ -808,12 +834,14 @@ function renderReport(){
       <div class="stat alert"><b>${cnt("Ausente")}</b><span>Ausentes</span></div>
     </div>
     <div class="tablebox"><table><thead><tr><th>Morador</th><th>Entrada</th><th>Salida</th><th>Tiempo</th><th>Estado</th></tr></thead><tbody>
-      ${rows.map(r => `<tr><td><b>${esc(fullName(r.p))}</b><br><small class="code muted">${esc(r.p.id)}</small>${r.manual ? ` <span class="tag warn">sin carné</span>` : ""}</td><td class="num">${r.e ? hhmm(r.e.hora) : "–"}</td><td class="num">${r.s ? hhmm(r.s.hora) : "–"}</td><td class="num">${r.min != null ? r.min + " min" : "–"}</td><td><span class="tag ${r.cls}">${r.est}</span></td></tr>`).join("")}
+      ${rows.map(r => `<tr><td><b>${esc(fullName(r.p))}</b><br><small class="code muted">${esc(r.p.id)}</small>${r.manual ? ` <span class="tag warn">sin carné</span>` : ""}</td><td class="num">${r.e ? hhmm(r.e.hora) : "–"}${r.tarde ? `<br><span class="tag warn">${r.minTarde} min tarde</span>` : ""}</td><td class="num">${r.s ? hhmm(r.s.hora) : "–"}</td><td class="num">${r.min != null ? r.min + " min" : "–"}</td><td><span class="tag ${r.cls}">${r.est}</span></td></tr>`).join("")}
     </tbody></table></div>
     <div class="card"><h3>Alertas (${inc.length})</h3>
       ${inc.length ? `<div class="list">${inc.map(i => { const p = S.people.get(i.persona); return `<div class="item"><span class="tag bad">${hhmm(i.hora)}</span><div class="grow"><b>${esc(INC[i.tipo] || i.tipo)}</b><small>${p ? esc(fullName(p)) + " · " : ""}${esc(i.detalle)}</small></div></div>`; }).join("")}</div>` : `<p class="muted">Sin alertas en esta asamblea.</p>`}
     </div>
-    <button type="button" class="primary block" id="repCsv">Descargar reporte (CSV para Excel)</button>`;
+    ${a.abierta ? `<p class="muted">Las multas de este evento se generan al cerrarlo.</p>` : `<button type="button" class="primary block" id="repMul">Generar multas de este evento</button>`}
+    <button type="button" class="block" id="repCsv">Descargar reporte (CSV para Excel)</button>`;
+  if ($("#repMul")) $("#repMul").addEventListener("click", () => generarMultas(a));
   $("#repCsv").addEventListener("click", () => {
     const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const lines = [["Código","Nombres","Apellidos","Sector","Entrada","Salida","Minutos","Estado","Sin carné"].map(q).join(",")]
@@ -823,6 +851,153 @@ function renderReport(){
   });
 }
 $("#repSel").addEventListener("change", renderReport);
+
+/* ===== Multas ===== */
+const infrNombre = c => (S.infr.find(i => i.codigo === c) || {}).nombre || c;
+const multasDe = pid => S.multas.filter(m => m.persona === pid).sort((a, b) => b.creada - a.creada);
+const debe = pid => S.multas.filter(m => m.persona === pid && m.estado === "pendiente").reduce((n, m) => n + Number(m.monto), 0);
+const tagMulta = m => `<span class="tag ${({pendiente:"bad", pagada:"in", condonada:"neutral", anulada:"neutral"})[m.estado]}">${ESTADO_MULTA[m.estado]}</span>`;
+function solvenciaBlock(pid){
+  const d = debe(pid), n = S.multas.filter(m => m.persona === pid && m.estado === "pendiente").length;
+  return d ? `<div class="verdict bad"><strong>Debe ${quetzales(d)}</strong><p>${n} multa${n > 1 ? "s" : ""} pendiente${n > 1 ? "s" : ""}. Véalas en la pestaña Multas.</p></div>`
+           : `<div class="verdict ok"><strong>Solvente</strong><p>No tiene multas pendientes.</p></div>`;
+}
+async function guardarMulta(m){ const i = S.multas.findIndex(x => x.id === m.id); if (i < 0) S.multas.push(m); else S.multas[i] = m; await put("multas", m); }
+function renderMultas(){
+  renderChrome();
+  const sum = est => S.multas.filter(m => m.estado === est).reduce((n, m) => n + Number(m.monto), 0);
+  const morosos = new Set(S.multas.filter(m => m.estado === "pendiente").map(m => m.persona)).size;
+  $("#mulStats").innerHTML = `
+    <div class="stat alert"><b class="money">${quetzales(sum("pendiente"))}</b><span>Por cobrar</span></div>
+    <div class="stat"><b class="money">${quetzales(sum("pagada"))}</b><span>Cobrado</span></div>
+    <div class="stat"><b>${morosos}</b><span>Con deuda</span></div>
+    <div class="stat"><b>${S.multas.filter(m => m.estado === "condonada").length}</b><span>Condonadas</span></div>`;
+  const f = S.mulFiltro;
+  $("#mulChips").innerHTML = [["pendiente","Pendientes"],["pagada","Pagadas"],["condonada","Condonadas"],["anulada","Anuladas"],["todas","Todas"]]
+    .map(([k, l]) => `<button type="button" data-f="${k}" aria-pressed="${k === f}">${l} (${k === "todas" ? S.multas.length : S.multas.filter(m => m.estado === k).length})</button>`).join("");
+  const q = $("#mulSearch").value.trim().toLowerCase();
+  const list = S.multas.filter(m => (f === "todas" || m.estado === f)).filter(m => { const p = S.people.get(m.persona); return !q || `${p ? fullName(p) : ""} ${m.persona}`.toLowerCase().includes(q); })
+    .sort((a, b) => b.creada - a.creada);
+  $("#mulList").innerHTML = list.map(m => { const p = S.people.get(m.persona);
+    return `<button type="button" class="item" data-mid="${esc(m.id)}">${p ? `<img src="${p.foto}" alt="">` : ""}<span class="grow"><b>${esc(p ? fullName(p) : m.persona)}</b><small>${esc(infrNombre(m.motivo))} · ${new Date(m.creada).toLocaleDateString("es-GT")}</small></span><span style="display:grid;justify-items:end;gap:4px"><span class="money">${quetzales(m.monto)}</span>${tagMulta(m)}</span></button>`; }).join("")
+    || `<p class="empty">No hay multas ${f === "todas" ? "" : ESTADO_MULTA[f].toLowerCase() + "s"}.</p>`;
+}
+$("#mulChips").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { S.mulFiltro = b.dataset.f; renderMultas(); } });
+$("#mulSearch").addEventListener("input", renderMultas);
+$("#mulList").addEventListener("click", e => { const b = e.target.closest("[data-mid]"); if (b) multaDetail(b.dataset.mid); });
+function multaDetail(id){
+  const m = S.multas.find(x => x.id === id), p = S.people.get(m.persona), a = m.asamblea && S.assemblies.get(m.asamblea);
+  openSheet(`${p ? whoBlock(p) : ""}
+    <div class="verdict ${m.estado === "pendiente" ? "bad" : m.estado === "pagada" ? "ok" : "warn"}"><strong>${esc(infrNombre(m.motivo))} · ${quetzales(m.monto)}</strong>
+      <p>${esc(m.descripcion || "")}${a ? `<br>Evento: ${esc(a.nombre)} (${esc(fecha(a.fecha))})` : ""}<br>Asignada el ${new Date(m.creada).toLocaleDateString("es-GT")}</p></div>
+    <p>${tagMulta(m)} ${m.estado === "pagada" ? `Recibo <span class="code">${esc(m.recibo)}</span> del ${new Date(m.pagada_en).toLocaleDateString("es-GT")}` : ""}${m.nota ? `<br><span class="muted">${esc(m.nota)}</span>` : ""}</p>
+    ${m.estado === "pendiente" ? `
+      <button type="button" class="ok block" id="mPay">Cobrar ${quetzales(m.monto)}</button>
+      <label>Motivo para condonar o anular<input id="mNota" placeholder="Por ejemplo: presentó constancia médica"></label>
+      <div class="grid2"><button type="button" id="mCond">Condonar</button><button type="button" class="danger" id="mAnul">Anular (fue un error)</button></div>
+      <p id="mErr" class="verdict bad" hidden></p>` : m.estado === "pagada" ? `<button type="button" class="primary block" id="mRec">Ver recibo</button>` : ""}
+    <button type="button" class="block" id="mClose">Cerrar</button>`);
+  $("#mClose").addEventListener("click", closeSheet);
+  if ($("#mRec")) $("#mRec").addEventListener("click", () => recibo(m));
+  if (m.estado !== "pendiente") return;
+  armConfirm($("#mPay"), `Toque otra vez: recibir ${quetzales(m.monto)}`, async () => {
+    S.recibo += 1; await putKV("recibo", S.recibo);
+    Object.assign(m, { estado: "pagada", pagada_en: Date.now(), recibo: "R-" + String(S.recibo).padStart(4, "0") });
+    await guardarMulta(m); renderMultas(); recibo(m);
+  });
+  const cerrar = (estado, verbo) => async () => {
+    const nota = $("#mNota").value.trim();
+    if (!nota) { $("#mErr").textContent = `Escriba el motivo para ${verbo}. Queda anotado en la multa.`; $("#mErr").hidden = false; return; }
+    Object.assign(m, { estado, nota: `${estado === "condonada" ? "Condonada" : "Anulada"}: ${nota}` }); await guardarMulta(m);
+    toast(`Multa ${ESTADO_MULTA[estado].toLowerCase()}`); closeSheet(); renderMultas();
+  };
+  $("#mCond").addEventListener("click", cerrar("condonada", "condonar"));
+  $("#mAnul").addEventListener("click", cerrar("anulada", "anular"));
+}
+async function reciboCanvas(m){
+  const p = S.people.get(m.persona), c = document.createElement("canvas"); c.width = 900; c.height = 560; const g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, 900, 560); g.fillStyle = "#2f3a8f"; g.fillRect(0, 0, 900, 96);
+  g.fillStyle = "#fff"; g.font = "bold 34px 'Atkinson Hyperlegible', sans-serif"; g.fillText(S.cfg.comunidad, 36, 52);
+  g.font = "22px 'Atkinson Hyperlegible', sans-serif"; g.fillText("Recibo de pago de multa", 36, 82);
+  g.textAlign = "right"; g.font = "bold 30px 'Atkinson Hyperlegible Mono', monospace"; g.fillText(m.recibo, 864, 60); g.textAlign = "left";
+  const fila = (y, k, v) => { g.fillStyle = "#5a5f80"; g.font = "22px 'Atkinson Hyperlegible', sans-serif"; g.fillText(k, 36, y); g.fillStyle = "#1b1f3b"; g.font = "bold 26px 'Atkinson Hyperlegible', sans-serif"; g.fillText(v, 260, y); };
+  fila(160, "Recibimos de", p ? fullName(p) : m.persona); fila(205, "Código", m.persona); fila(250, "Por", infrNombre(m.motivo));
+  fila(295, "Detalle", (m.descripcion || "").slice(0, 46)); fila(340, "Fecha", new Date(m.pagada_en).toLocaleString("es-GT", {dateStyle:"long", timeStyle:"short"}));
+  g.fillStyle = "#e3f4ea"; g.fillRect(36, 380, 828, 80); g.fillStyle = "#1d7a4c"; g.font = "bold 44px 'Atkinson Hyperlegible Mono', monospace"; g.fillText("Total " + quetzales(m.monto), 60, 436);
+  g.fillStyle = "#5a5f80"; g.font = "18px 'Atkinson Hyperlegible', sans-serif"; g.fillText("Creado por Tecnoiagt · www.tecnoiagt.com", 36, 520);
+  if (m.ejemplo) { g.fillStyle = "rgba(181,83,47,.35)"; g.font = "bold 40px sans-serif"; g.textAlign = "right"; g.fillText("EJEMPLO", 864, 520); g.textAlign = "left"; }
+  g.fillStyle = "#b5532f"; g.fillRect(0, 548, 900, 12);
+  return c;
+}
+async function recibo(m){
+  const c = await reciboCanvas(m);
+  openSheet(`<h2>Pago registrado</h2><img class="cardimg" src="${c.toDataURL("image/png")}" alt="Recibo ${esc(m.recibo)}">
+    <button type="button" class="primary block" id="rDown">Descargar recibo</button><button type="button" class="block" id="rClose">Cerrar</button>`);
+  $("#rDown").addEventListener("click", async () => saveFile(`recibo-${m.recibo}.png`, await canvasBlob(c)));
+  $("#rClose").addEventListener("click", () => { closeSheet(); renderMultas(); });
+}
+$("#mulNew").addEventListener("click", () => nuevaMulta());
+function nuevaMulta(pid){
+  let sel = pid || "";
+  const asms = [...S.assemblies.values()].sort((a, b) => b.abierta_en - a.abierta_en);
+  openSheet(`<h2>Nueva multa</h2>
+    <label>Morador<input id="nmQ" type="search" placeholder="Nombre o código" autocomplete="off"></label><div id="nmRes" class="list"></div>
+    <label>Infracción<select id="nmInf">${S.infr.map(i => `<option value="${esc(i.codigo)}">${esc(i.nombre)}${i.monto ? " · " + quetzales(i.monto) : ""}</option>`).join("")}</select></label>
+    <div class="grid2"><label>Monto (Q)<input id="nmMonto" type="number" inputmode="decimal" min="1" step="0.5"></label>
+      <label>Evento (opcional)<select id="nmAsm"><option value="">Ninguno</option>${asms.map(a => `<option value="${a.id}">${esc(a.nombre)} · ${esc(fecha(a.fecha))}</option>`).join("")}</select></label></div>
+    <label>Descripción<input id="nmDesc" placeholder="Qué pasó"></label>
+    <p id="nmErr" class="verdict bad" hidden></p>
+    <button type="button" class="primary block" id="nmSave">Asignar multa</button><button type="button" class="block" id="nmCancel">Cancelar</button>`);
+  const setMonto = () => { const i = S.infr.find(x => x.codigo === $("#nmInf").value); $("#nmMonto").value = i && i.monto ? i.monto : ""; };
+  $("#nmInf").addEventListener("change", setMonto); setMonto();
+  const draw = () => { const q = $("#nmQ").value.trim().toLowerCase();
+    if (sel) { const p = S.people.get(sel); $("#nmRes").innerHTML = `<div class="item"><img src="${p.foto}" alt=""><span class="grow"><b>${esc(fullName(p))}</b><small class="code">${esc(p.id)}</small></span><button type="button" id="nmChange">Cambiar</button></div>`; $("#nmQ").parentElement.hidden = true; $("#nmChange").addEventListener("click", () => { sel = ""; $("#nmQ").parentElement.hidden = false; draw(); }); return; }
+    const r = [...S.people.values()].filter(p => p.estado === "activo" && (!q || (fullName(p) + " " + p.id).toLowerCase().includes(q))).slice(0, 6);
+    $("#nmRes").innerHTML = r.map(p => `<button type="button" class="item" data-id="${esc(p.id)}"><img src="${p.foto}" alt=""><span class="grow"><b>${esc(fullName(p))}</b><small class="code">${esc(p.id)}</small></span></button>`).join(""); };
+  $("#nmQ").addEventListener("input", draw); draw();
+  $("#nmRes").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b) { sel = b.dataset.id; draw(); } });
+  $("#nmCancel").addEventListener("click", closeSheet);
+  $("#nmSave").addEventListener("click", async () => {
+    const err = $("#nmErr"), monto = Number($("#nmMonto").value);
+    if (!sel) { err.textContent = "Elija al morador."; err.hidden = false; return; }
+    if (!(monto > 0)) { err.textContent = "Escriba un monto mayor que cero."; err.hidden = false; return; }
+    const m = { id: uid(), persona: sel, asamblea: $("#nmAsm").value || null, motivo: $("#nmInf").value, descripcion: $("#nmDesc").value.trim() || infrNombre($("#nmInf").value),
+      monto, estado: "pendiente", creada: Date.now(), pagada_en: null, recibo: "", nota: "", ejemplo: false };
+    await guardarMulta(m); closeSheet(); toast(`Multa asignada a ${fullName(S.people.get(sel))}`); S.mulFiltro = "pendiente"; if (S.tab === "multas") renderMultas(); else showTab("multas");
+  });
+}
+$("#mulCat").addEventListener("click", catalogo);
+function catalogo(){
+  openSheet(`<h2>Infracciones y montos</h2><p class="muted">Los montos los decide la asamblea. Los que vienen son de ejemplo.</p>
+    <div id="catRows" class="list">${S.infr.map((i, k) => `<div class="grid2" data-k="${k}"><label>Infracción<input value="${esc(i.nombre)}" data-f="nombre"></label><label>Monto (Q, 0 = se escribe cada vez)<input type="number" inputmode="decimal" min="0" step="0.5" value="${i.monto}" data-f="monto"></label></div>`).join("")}</div>
+    <button type="button" class="block" id="catAdd">Agregar infracción</button>
+    <button type="button" class="primary block" id="catSave">Guardar</button><button type="button" class="block" id="catCancel">Cancelar</button>`);
+  $("#catAdd").addEventListener("click", () => { const k = $("#catRows").children.length;
+    $("#catRows").insertAdjacentHTML("beforeend", `<div class="grid2" data-k="${k}"><label>Infracción<input data-f="nombre" placeholder="Por ejemplo: no cumplir un cargo"></label><label>Monto (Q)<input type="number" inputmode="decimal" min="0" step="0.5" value="0" data-f="monto"></label></div>`); });
+  $("#catCancel").addEventListener("click", closeSheet);
+  $("#catSave").addEventListener("click", async () => {
+    S.infr = [...$("#catRows").children].map((row, k) => ({ codigo: (S.infr[k] || {}).codigo || "inf-" + uid(), nombre: row.querySelector('[data-f="nombre"]').value.trim(), monto: Number(row.querySelector('[data-f="monto"]').value) || 0 })).filter(i => i.nombre);
+    await putKV("infr", S.infr); closeSheet(); toast("Infracciones guardadas");
+  });
+}
+function generarMultas(a){
+  const personas = [...S.people.values()].filter(p => p.estado === "activo");
+  const nuevas = multasDeEvento(a, personas, pid => marksOf(a.id, pid), S.infr, S.multas);
+  const total = nuevas.reduce((n, m) => n + m.monto, 0), por = {};
+  nuevas.forEach(m => por[m.motivo] = (por[m.motivo] || 0) + 1);
+  openSheet(`<h2>Multas de ${esc(a.nombre)}</h2>
+    ${nuevas.length ? `<p>Según la asistencia registrada corresponden <b>${nuevas.length} multas</b> por <b class="money">${quetzales(total)}</b>:</p>
+      <div class="list">${Object.entries(por).map(([k, n]) => `<div class="row"><span class="grow">${esc(infrNombre(k))}</span><b>${n}</b></div>`).join("")}</div>
+      <p class="muted">Los que ya tienen multa por el mismo motivo en este evento no se repiten. Después puede condonar las que la directiva decida.</p>
+      <button type="button" class="primary block" id="gmYes">Asignar las ${nuevas.length} multas</button>`
+    : `<p>No corresponde ninguna multa nueva: todos cumplieron, o las multas ya se generaron.</p>`}
+    <button type="button" class="block" id="gmNo">Cerrar</button>`);
+  $("#gmNo").addEventListener("click", closeSheet);
+  if ($("#gmYes")) $("#gmYes").addEventListener("click", async () => {
+    for (const m of nuevas) await guardarMulta(Object.assign({ id: uid(), estado: "pendiente", creada: Date.now(), pagada_en: null, recibo: "", nota: "", ejemplo: !!a.ejemplo }, m));
+    closeSheet(); toast(`${nuevas.length} multas asignadas`); S.mulFiltro = "pendiente"; showTab("multas");
+  });
+}
 
 /* ===== Ajustes ===== */
 function renderSettings(){
@@ -836,7 +1011,7 @@ function renderSettings(){
 $("#cfgForm").addEventListener("submit", async e => { e.preventDefault(); S.cfg.comunidad = $("#cfgCom").value.trim(); S.cfg.lugar = $("#cfgLug").value.trim(); await putKV("cfg", S.cfg); renderSettings(); toast("Guardado"); });
 $("#bkDown").addEventListener("click", () => {
   const data = { app:"carne-comunal", v:1, exportado: new Date().toISOString(), cfg: S.cfg, seq: S.seq, keys: S.keys.jwk,
-    people:[...S.people.values()], assemblies:[...S.assemblies.values()], marks:S.marks, incidents:S.incidents };
+    people:[...S.people.values()], assemblies:[...S.assemblies.values()], marks:S.marks, incidents:S.incidents, multas:S.multas, infr:S.infr, recibo:S.recibo };
   saveFile(`copia-carne-comunal-${todayISO()}.json`, JSON.stringify(data));
 });
 $("#bkUp").addEventListener("change", async e => {
@@ -851,64 +1026,54 @@ $("#bkUp").addEventListener("change", async e => {
     await Promise.all(STORES.map(clearStore));
     for (const p of d.people) await put("people", p); for (const a of d.assemblies) await put("assemblies", a);
     for (const m of d.marks) await put("marks", m); for (const i of d.incidents) await put("incidents", i);
+    for (const m of d.multas || []) await put("multas", m); if (d.infr) await putKV("infr", d.infr); await putKV("recibo", d.recibo || 0);
     await putKV("keys", d.keys); await putKV("cfg", d.cfg); await putKV("seq", d.seq); await putKV("seeded", true);
     await loadAll(); closeSheet(); toast("Copia restaurada"); showTab("asamblea");
   });
 });
-$("#demoOff").addEventListener("click", async () => {
+$("#demoOff").addEventListener("click", async () => { await quitarDemo();
+  if (!S.people.size) { S.seq = 0; await putKV("seq", 0); }
+  stopCam(); renderSettings(); toast("Datos de ejemplo quitados");
+});
+async function quitarDemo(){
   for (const p of [...S.people.values()].filter(p => p.ejemplo)) { S.people.delete(p.id); await del("people", p.id); }
   for (const a of [...S.assemblies.values()].filter(a => a.ejemplo)) { S.assemblies.delete(a.id); await del("assemblies", a.id); }
   for (const m of S.marks.filter(m => m.ejemplo)) await del("marks", m.id);
   for (const i of S.incidents.filter(i => i.ejemplo)) await del("incidents", i.id);
-  S.marks = S.marks.filter(m => !m.ejemplo); S.incidents = S.incidents.filter(i => !i.ejemplo);
-  if (!S.people.size) { S.seq = 0; await putKV("seq", 0); }
-  stopCam(); renderSettings(); toast("Datos de ejemplo quitados");
-});
+  for (const m of S.multas.filter(m => m.ejemplo)) await del("multas", m.id);
+  S.marks = S.marks.filter(m => !m.ejemplo); S.incidents = S.incidents.filter(i => !i.ejemplo); S.multas = S.multas.filter(m => !m.ejemplo);
+}
 $("#demoOn").addEventListener("click", async () => { await seedDemo(); renderSettings(); toast("Datos de ejemplo cargados"); });
 armConfirm($("#wipe"), "Toque otra vez: se borra todo menos la llave", async () => {
-  await Promise.all(STORES.map(clearStore)); S.people.clear(); S.assemblies.clear(); S.marks = []; S.incidents = []; S.seq = 0; await putKV("seq", 0);
+  await Promise.all(STORES.map(clearStore)); S.people.clear(); S.assemblies.clear(); S.marks = []; S.incidents = []; S.multas = []; S.seq = 0; S.recibo = 0; await putKV("seq", 0); await putKV("recibo", 0);
   stopCam(); renderSettings(); toast("Datos borrados");
 });
 
-/* ===== Datos de ejemplo (personas ficticias) ===== */
-const DEMO = [
-  ["María Elena","Tzul Batz","Sector Centro","Tejedora","1968-03-14"],["Juan Diego","Chuc Tax","Sector Norte","Carpintero","1975-07-02"],
-  ["Rosa Amalia","Ixcoy Puac","Sector Centro","Comerciante","1982-11-21"],["Pedro Pablo","Sapón Tzoc","Sector Sur","Agricultor","1959-01-30"],
-  ["Catarina","Pu Cuxil","Sector Oriente","Tejedora","1990-05-09"],["Francisco","Batz Ixcoy","Sector Norte","Albañil","1971-09-17"],
-  ["Juana Isabel","Tax Chuc","Sector Sur","Maestra","1986-12-03"],["Diego Alberto","Tzoc Sapón","Sector Oriente","Mecánico","1994-04-25"],
-  ["Magdalena","Puac Tzul","Sector Centro","Comadrona","1955-08-12"],["Manuel","Cuxil Pu","Sector Norte","Agricultor","1979-02-28"],
-  ["Ana Lucía","Chuc Sapón","Sector Sur","Enfermera","1992-10-06"],["Tomás","Ixcoy Batz","Sector Oriente","Panadero","1965-06-19"]];
+/* ===== Datos de ejemplo (personas ficticias, compartidos con la app del miembro) ===== */
+const DEMO_VERSION = 2;
 async function seedDemo(){
   const hues = [12, 210, 140, 32, 280, 190, 330, 95, 50, 240, 170, 0];
-  const base = S.seq; const ppl = [];
-  for (let i = 0; i < DEMO.length; i++) {
-    const [n, a, s, o, b] = DEMO[i]; S.seq += 1;
-    const p = { id: `${S.cfg.prefijo}-${String(S.seq).padStart(4, "0")}`, nombres: n, apellidos: a, sector: s, oficio: o, nacimiento: b, telefono: "",
-      foto: demoAvatar(n[0] + a[0], hues[i]), ver: 1, estado: "activo", creado: Date.now(), anulados: [], ejemplo: true };
-    if (i === 5) { p.anulados = [{ver: 1, fecha: Date.now() - 86400000}]; p.ver = 2; }
-    S.people.set(p.id, p); await put("people", p); ppl.push(p);
+  const d = demoConstruir(S.cfg.prefijo);
+  for (const [i, p] of d.people.entries()) {
+    if (S.people.has(p.id)) continue;
+    p.foto = demoAvatar(p.nombres[0] + p.apellidos[0], hues[i]); p.creado = Date.now();
+    S.people.set(p.id, p); await put("people", p);
   }
-  await putKV("seq", S.seq);
-  if (!activeAsm()) {
-    const t0 = new Date(); t0.setHours(8, 0, 0, 0); const T = m => t0.getTime() + m * 60000;
-    const a = { id: uid(), nombre: "Asamblea de práctica", fecha: todayISO(), abierta: true, abierta_en: T(0), cerrada_en: null, ejemplo: true };
-    S.assemblies.set(a.id, a); await put("assemblies", a);
-    const add = async (pi, tipo, min) => { const m = { id: uid(), asamblea: a.id, persona: ppl[pi].id, tipo, hora: T(min), via: "carne", motivo: "", ejemplo: true }; S.marks.push(m); await put("marks", m); };
-    await add(0, "entrada", 3); await add(1, "entrada", 5); await add(2, "entrada", 6); await add(3, "entrada", 9);
-    await add(4, "entrada", 12); await add(6, "entrada", 14); await add(8, "entrada", 21);
-    await add(3, "salida", 150); await add(8, "salida", 158);
-    const inc = async (pi, tipo, detalle, min) => { const i = { id: uid(), asamblea: a.id, persona: ppl[pi].id, tipo, detalle, hora: T(min), ejemplo: true }; S.incidents.push(i); await put("incidents", i); };
-    await inc(1, "doble", "Intentó marcar entrada por segunda vez", 17);
-    await inc(5, "anulado", "Presentó el carné número 1; el vigente es el 2", 19);
-  }
-  await putKV("seeded", true);
+  S.seq = Math.max(S.seq, d.people.length); await putKV("seq", S.seq);
+  for (const a of d.assemblies) { if (a.abierta && activeAsm()) a.abierta = false; S.assemblies.set(a.id, a); await put("assemblies", a); }
+  for (const m of d.marks) { S.marks.push(m); await put("marks", m); }
+  for (const x of d.incidents) { S.incidents.push(x); await put("incidents", x); }
+  for (const m of d.multas) { S.multas.push(m); await put("multas", m); }
+  S.recibo = Math.max(S.recibo, d.recibo); await putKV("recibo", S.recibo);
+  await putKV("seeded", true); await putKV("demoVersion", DEMO_VERSION);
 }
 
 /* ===== Arranque ===== */
 async function loadAll(){
   S.people = new Map((await getAll("people") || []).map(p => [p.id, p]));
   S.assemblies = new Map((await getAll("assemblies") || []).map(a => [a.id, a]));
-  S.marks = await getAll("marks") || []; S.incidents = await getAll("incidents") || [];
+  S.marks = await getAll("marks") || []; S.incidents = await getAll("incidents") || []; S.multas = await getAll("multas") || [];
+  S.infr = await getKV("infr") || S.infr; S.recibo = await getKV("recibo") || 0;
   S.cfg = Object.assign(S.cfg, await getKV("cfg") || {}); S.seq = await getKV("seq") || 0;
   await ensureKeys();
 }
@@ -917,11 +1082,12 @@ async function loadAll(){
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch {}
   await loadAll();
   if (!S.people.size && !(await getKV("seeded"))) await seedDemo();
+  else if ([...S.people.values()].some(p => p.ejemplo) && (await getKV("demoVersion")) !== DEMO_VERSION) { await quitarDemo(); await seedDemo(); }
   $("#asmDate").value = todayISO();
   showTab("asamblea");
   Sy.cfg = await getKV("sync") || null; Sy.pend = Object.assign(Sy.pend, await getKV("pend") || {});
   setInterval(() => { if (navigator.onLine !== false) syncNow(false); }, 120000); syncNow(false);
-  window.__app = { S, Sy, evaluateQR, checkMark, commitMark, qrText, cardCanvas, sheetCanvas, seedDemo, enrollText, syncNow, mergeRemote };
+  window.__app = { S, Sy, evaluateQR, checkMark, commitMark, qrText, cardCanvas, sheetCanvas, seedDemo, enrollText, syncNow, mergeRemote, generarMultas };
 })();
 document.addEventListener("visibilitychange", () => { if (document.hidden) stopCam(); });
 /* ===== Sincronización con la base comunal (Supabase) ===== */
@@ -1023,7 +1189,7 @@ async function syncNow(manual){
   } catch (e) {
     if (e.status === 401 || e.status === 400 && /refresh/i.test(e.message)) { Sy.cfg.session = null; await putKV("sync", Sy.cfg); }
     if (st) { st.hidden = false; st.className = "verdict bad"; st.textContent = e.message; }
-  } finally { Sy.busy = false; renderSyncPill(); if (S.tab !== "ajustes") { ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport})[S.tab](); } }
+  } finally { Sy.busy = false; renderSyncPill(); if (S.tab !== "ajustes") { ({asamblea: renderAsm, moradores: renderPeople, reporte: renderReport, multas: renderMultas})[S.tab](); } }
 }
 async function mergeRemote(d){
   const raw = (st, o) => tx(st, "readwrite", s => s.put(o));
