@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@500&display=swap">
 <style>
-/* Layout: app de una columna para celular, barra de pestañas fija abajo, hojas emergentes para cada resultado */
+/* Layout: pensada para laptop (barra lateral, dos columnas, ventanas centradas); en celular, una columna con pestañas abajo y hojas emergentes */
 :root{
   --bg:#f2f3f8; --surface:#ffffff; --sunk:#e8eaf3; --ink:#1b1f3b; --muted:#5a5f80; --line:#d9dcea;
   --indigo:#2f3a8f; --indigo-ink:#ffffff; --terra:#b5532f;
@@ -122,6 +122,25 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
 .photo-pick img{width:96px;height:120px;border-radius:10px;object-fit:cover;background:var(--sunk);border:1px dashed var(--line)}
 .fileBtn{position:relative;overflow:hidden}
 .fileBtn input{position:absolute;inset:0;opacity:0;cursor:pointer;min-height:0}
+@media (min-width:960px){
+  body{padding-bottom:16px;padding-left:200px}
+  .wrap{max-width:1180px;padding-inline:28px}
+  nav.tabs{top:0;right:auto;width:200px;border-top:0;border-right:1px solid var(--line);padding:84px 12px 16px}
+  nav.tabs .in{display:grid;grid-template-columns:1fr;gap:4px;max-width:none}
+  nav.tabs button{flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;font-size:16px;border-radius:12px;padding:8px 14px}
+  nav.tabs button[aria-current="page"]{background:var(--sunk)}
+  nav.tabs button:hover{background:var(--sunk)}
+  .sheet{align-items:center;padding:24px}
+  .sheet .panel{max-width:640px;border-radius:20px;max-height:88vh;padding:24px}
+  .toast{bottom:24px}
+  #asmLive{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:16px 24px}
+  #asmLive > .a-stats,#asmLive > .a-close{grid-column:1/-1}
+  #asmLive > .a-seg,#asmLive > .viewer,#asmLive > .a-btns{grid-column:1}
+  #asmLive > .viewer{aspect-ratio:16/10}
+  #asmLive > .a-recent{grid-column:2;grid-row:2/span 3;max-height:70vh;overflow:auto}
+  #asmLive > .a-close{justify-self:end;width:auto}
+  #pplList,#mulList{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+}
 @media (prefers-reduced-motion:no-preference){.sheet .panel{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
 </style>
 
@@ -149,7 +168,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
       </form>
     </div>
     <div id="asmLive" class="list" style="gap:16px" hidden>
-      <div class="card">
+      <div class="card a-stats">
         <div class="row"><div class="grow"><h2 id="asmTitle"></h2><p class="muted" id="asmMeta"></p></div></div>
         <div class="stats">
           <div class="stat"><b id="stDentro">0</b><span>Dentro ahora</span></div>
@@ -158,7 +177,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
           <div class="stat alert"><b id="stAle">0</b><span>Alertas</span></div>
         </div>
       </div>
-      <div class="seg" role="group" aria-label="Qué se marca">
+      <div class="seg a-seg" role="group" aria-label="Qué se marca">
         <button type="button" data-mode="entrada" aria-pressed="true" id="modeIn">Entrada</button>
         <button type="button" data-mode="salida" aria-pressed="false" id="modeOut">Salida</button>
       </div>
@@ -170,15 +189,15 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
           <button class="primary" type="button" id="camStart">Encender cámara</button>
         </div>
       </div>
-      <div class="grid2">
+      <div class="grid2 a-btns">
         <span class="btn fileBtn block">Fotografiar carné<input type="file" accept="image/*" capture="environment" id="snapQR" aria-label="Fotografiar carné"></span>
         <button type="button" class="block" id="manualBtn">Buscar sin carné</button>
       </div>
-      <div class="card">
+      <div class="card a-recent">
         <h3>Últimos marcajes</h3>
         <div id="recent" class="list"></div>
       </div>
-      <button type="button" class="danger block" id="closeAsm">Cerrar asamblea</button>
+      <button type="button" class="danger block a-close" id="closeAsm">Cerrar asamblea</button>
     </div>
   </section>
 
@@ -230,7 +249,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
     </form>
     <div class="card">
       <h3>Copia de seguridad</h3>
-      <p class="muted">Los datos se guardan solo en este celular. Descargue una copia al terminar cada asamblea. Para usar un segundo celular, restaure en él la misma copia: así reconoce los mismos carnés.</p>
+      <p class="muted">Los datos se guardan solo en este equipo. Descargue una copia al terminar cada asamblea. Para usar otra computadora o un celular de emergencia, restaure en él la misma copia: así reconoce los mismos carnés.</p>
       <p class="muted">La copia incluye la llave que firma los carnés. Guárdela en un lugar seguro, porque con ella se podrían fabricar carnés válidos.</p>
       <div class="grid2">
         <button type="button" id="bkDown">Descargar copia</button>
@@ -252,7 +271,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
         <button type="button" id="syncOut">Salir de la cuenta</button>
       </div>
       <p id="syncMsg" class="muted" hidden></p>
-      <p class="muted" style="font-size:14px">Con señal, la app envía sola los marcajes y trae lo que registraron los otros celulares. Sin señal sigue funcionando y envía después.</p>
+      <p class="muted" style="font-size:14px">Con señal, la app envía sola los marcajes y trae lo que registraron los otros equipos. Sin señal sigue funcionando y envía después.</p>
     </div>
     <div class="card">
       <h3>Datos de ejemplo</h3>
@@ -267,7 +286,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
       <p class="muted">Cada código QR va firmado con la llave de esta comunidad. Un carné copiado a mano, alterado o reemplazado se rechaza al escanearlo. Huella de la llave: <span class="code" id="keyFp"></span></p>
       <button type="button" class="danger" id="wipe">Borrar todos los datos</button>
     </div>
-    <p class="foot">Versión demo 1.3 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+    <p class="foot">Versión demo 1.4 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
   </section>
 </main></div>
 
@@ -306,7 +325,7 @@ function armConfirm(btn, label, fn){
   });
 }
 
-/* ===== Almacenamiento (IndexedDB en este celular) ===== */
+/* ===== Almacenamiento (IndexedDB en este equipo) ===== */
 const STORES = ["people", "assemblies", "marks", "incidents", "multas"];
 const DB = { db: null };
 function idbOpen(){
@@ -397,7 +416,7 @@ async function evaluateQR(txt){
     return { kind:"bad", title:"Carné falso o alterado", detail:"La firma no corresponde a esta comunidad. No registre a la persona con este carné." };
   }
   const per = S.people.get(p[1]);
-  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este celular. Restaure la copia más reciente.` };
+  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este equipo. Restaure la copia más reciente.` };
   if (String(per.ver) !== p[2]) {
     await incident("anulado", per.id, `Presentó el carné número ${p[2]}; el vigente es el ${per.ver}`);
     return { kind:"bad", person: per, title:"Carné anulado", detail:`Este carné fue reemplazado. Solo vale el carné número ${per.ver}.` };
@@ -410,7 +429,7 @@ async function evaluateQR(txt){
 }
 async function evaluateDigital(p){
   const per = S.people.get(p[1]);
-  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este celular. Restaure la copia más reciente.` };
+  if (!per) return { kind:"bad", title:"La persona no está en el padrón", detail:`El código ${p[1]} no aparece en este equipo. Restaure la copia más reciente.` };
   if (String(per.ver) !== p[2]) {
     await incident("anulado", per.id, `Carné digital del número ${p[2]}; el vigente es el ${per.ver}`);
     return { kind:"bad", person: per, title:"Carné digital anulado", detail:`Este carné fue reemplazado. Debe activar en su celular el carné número ${per.ver}.` };
@@ -618,7 +637,7 @@ async function startCam(){
   const msg = $("#camMsg");
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { msg.textContent = "Este navegador no permite usar la cámara en vivo. Use «Fotografiar carné»."; return; }
   try { Scan.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}, width:{ideal:1280}}, audio:false}); }
-  catch (e) { msg.textContent = "No se pudo encender la cámara en vivo en esta pantalla. Use «Fotografiar carné», que abre la cámara del celular."; return; }
+  catch (e) { msg.textContent = "No se pudo encender la cámara en vivo en esta pantalla. Use «Fotografiar carné» para tomar o elegir una foto del código."; return; }
   const v = $("#video"); v.srcObject = Scan.stream; v.hidden = false; $("#frame").hidden = false; $("#camIdle").hidden = true;
   try { await v.play(); } catch {}
   if (!Scan.detector && "BarcodeDetector" in window) { try { const f = await BarcodeDetector.getSupportedFormats(); if (f.includes("qr_code")) Scan.detector = new BarcodeDetector({formats:["qr_code"]}); } catch {} }
@@ -1019,7 +1038,7 @@ $("#bkUp").addEventListener("change", async e => {
   let d; try { d = JSON.parse(await f.text()); } catch { toast("El archivo no es una copia válida"); return; }
   if (d.app !== "carne-comunal" || !d.keys || !Array.isArray(d.people)) { toast("El archivo no es una copia del carné comunal"); return; }
   openSheet(`<h2>Restaurar copia</h2><p>La copia es del ${esc(new Date(d.exportado).toLocaleString("es-GT"))} y trae ${d.people.length} moradores y ${d.assemblies.length} asambleas.</p>
-    <div class="verdict warn"><strong>Se reemplazará todo lo que hay en este celular</strong><p>Incluida la llave de firma. Los carnés firmados por otra llave dejarán de valer aquí.</p></div>
+    <div class="verdict warn"><strong>Se reemplazará todo lo que hay en este equipo</strong><p>Incluida la llave de firma. Los carnés firmados por otra llave dejarán de valer aquí.</p></div>
     <button class="danger block" type="button" id="rsYes">Reemplazar con la copia</button><button class="block" type="button" id="rsNo">Cancelar</button>`);
   $("#rsNo").addEventListener("click", closeSheet);
   $("#rsYes").addEventListener("click", async () => {
@@ -1131,13 +1150,13 @@ async function ensureSession(){
 const rpc = (fn, args) => api("/rest/v1/rpc/" + fn, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(args) });
 const sameJwk = (a, b) => a && b && a.x === b.x && a.y === b.y;
 async function checkKeys(com){
-  // La llave pública y el secreto del QR deben ser los mismos en todos los celulares de la comunidad
+  // La llave pública y el secreto del QR deben ser los mismos en todos los equipos de la comunidad
   const rows = await api(`/rest/v1/comunidades?id=eq.${encodeURIComponent(com)}&select=llave_publica`);
   if (!rows || !rows.length) throw new Error(`La comunidad ${com} no existe en la base. Pida al administrador que la cree.`);
   const srv = rows[0].llave_publica, mine = S.keys.jwk.pub;
-  if (srv && !sameJwk(srv, mine)) throw new Error("Este celular firma con otra llave que la registrada en la base. Restaure aquí la copia de seguridad del celular principal y vuelva a sincronizar.");
+  if (srv && !sameJwk(srv, mine)) throw new Error("Este equipo firma con otra llave que la registrada en la base. Restaure aquí la copia de seguridad del equipo principal y vuelva a sincronizar.");
   if (!srv) {
-    const ADMIN = "La primera sincronización la debe hacer un administrador, desde el celular que imprime los carnés.";
+    const ADMIN = "La primera sincronización la debe hacer un administrador, desde el equipo que imprime los carnés.";
     let upd;
     try { upd = await api(`/rest/v1/comunidades?id=eq.${encodeURIComponent(com)}`, { method:"PATCH", headers:{"Content-Type":"application/json", Prefer:"return=representation"}, body: JSON.stringify({ llave_publica: { kty: mine.kty, crv: mine.crv, x: mine.x, y: mine.y } }) }); }
     catch (e) { throw new Error(e.status === 401 || e.status === 403 ? ADMIN : e.message); }
@@ -1146,7 +1165,7 @@ async function checkKeys(com){
     catch (e) { throw new Error(e.status === 401 || e.status === 403 ? ADMIN : e.message); }
   } else {
     const sec = await api(`/rest/v1/comunidad_secretos?comunidad_id=eq.${encodeURIComponent(com)}&select=hmac_qr`);
-    if (sec && sec[0] && sec[0].hmac_qr && sec[0].hmac_qr !== S.keys.jwk.master) throw new Error("El secreto del carné digital de este celular no coincide con el de la base. Restaure la copia del celular principal.");
+    if (sec && sec[0] && sec[0].hmac_qr && sec[0].hmac_qr !== S.keys.jwk.master) throw new Error("El secreto del carné digital de este equipo no coincide con el de la base. Restaure la copia del equipo principal.");
   }
 }
 async function uploadPhoto(com, p){
@@ -1179,7 +1198,7 @@ async function syncNow(manual){
     if (pendCount()) res = await rpc("sync_subir", { p_comunidad: com, p_dispositivo: Sy.cfg.device, p_lote: lote }) || res;
     for (const k of Object.keys(Sy.pend)) Sy.pend[k] = Sy.pend[k].filter(id => !sent[k].includes(id));
     await putKV("pend", Sy.pend);
-    // 2) Bajar lo de los demás celulares
+    // 2) Bajar lo de los demás equipos
     const d = await rpc("sync_bajar", { p_comunidad: com, p_desde: Sy.cfg.cursor ?? null });
     await mergeRemote(d);
     for (const id of res.dobles || []) { const m = S.marks.find(x => x.id === id); if (m && m.valido !== false) { m.valido = false; await tx("marks", "readwrite", s => s.put(m)); } }
