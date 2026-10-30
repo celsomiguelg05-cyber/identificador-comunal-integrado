@@ -36,14 +36,14 @@ for i in range(1,81):
     else:
         out.append(f"insert into public.carnes (comunidad_id,morador_id,ver,estado,emitido,anulado_en,motivo) values ('PXT',{q(pid)},{ver},'anulado','{creado}+00','2026-09-01 15:00+00','baja');")
 # eventos: (id, tipo, nombre, fecha, lugar, multa_falta, multa_sin_salida, abierta)
-EV=[("demo-asm-2026-06","asamblea","Asamblea general de junio","2026-06-07","Salón comunal",25,10),
-    ("demo-faena-2026-06","faena","Faena: limpieza del nacimiento de agua","2026-06-20","Nacimiento Pa Ja'",50,25),
-    ("demo-asm-2026-07","asamblea","Asamblea general de julio","2026-07-05","Salón comunal",25,10),
-    ("demo-asm-2026-08","asamblea","Asamblea general de agosto","2026-08-02","Salón comunal",25,10),
-    ("demo-faena-2026-08","faena","Faena: reparación del camino al bosque comunal","2026-08-22","Camino al bosque",50,25),
-    ("demo-asm-2026-09","asamblea","Asamblea general de septiembre","2026-09-06","Salón comunal",25,10),
+EV=[("demo-asm-2026-06","asamblea","Asamblea general de junio","2026-06-07","Salón comunal",50,25),
+    ("demo-faena-2026-06","faena","Faena: limpieza del nacimiento de agua","2026-06-20","Nacimiento Pa Ja'",75,25),
+    ("demo-asm-2026-07","asamblea","Asamblea general de julio","2026-07-05","Salón comunal",50,25),
+    ("demo-asm-2026-08","asamblea","Asamblea general de agosto","2026-08-02","Salón comunal",50,25),
+    ("demo-faena-2026-08","faena","Faena: reparación del camino al bosque comunal","2026-08-22","Camino al bosque",75,25),
+    ("demo-asm-2026-09","asamblea","Asamblea general de septiembre","2026-09-06","Salón comunal",50,25),
     ("demo-reu-2026-09","reunion","Reunión del comité de agua","2026-09-19","Escuela",None,None),
-    ("demo-asm-2026-10","asamblea","Asamblea general de octubre","2026-10-04","Salón comunal",25,10)]
+    ("demo-asm-2026-10","asamblea","Asamblea general de octubre","2026-10-04","Salón comunal",50,25)]
 mk=0; inc=0
 lazy=set(random.sample(range(80),8))   # faltan seguido
 for (eid,tipo,nom,fecha,lugar,mf,ms) in EV:

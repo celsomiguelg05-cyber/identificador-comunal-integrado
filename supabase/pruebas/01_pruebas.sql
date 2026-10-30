@@ -249,7 +249,7 @@ do $$ begin
   assert (select tarde from public.v_asistencia where asamblea_id='asm2' and morador_id='PXT-0002'), 'Pedro llegó 30 min tarde';
   assert not (select tarde from public.v_asistencia where asamblea_id='asm2' and morador_id='PXT-0001'), 'Juana a tiempo (5 min)';
   assert (select count(*) from public.multas where id='x1') = 0, 'operador no crea multas';
-  assert (select monto from public.infracciones where codigo='tardanza') = 5, 'operador no cambia catálogo';
+  assert (select monto from public.infracciones where codigo='tardanza') = 10, 'operador no cambia catálogo';
 end $$;
 
 select pg_temp.como('00000000-0000-0000-0000-00000000000d');
@@ -272,7 +272,7 @@ do $$ declare b jsonb; begin
   assert (select estado || recibo from public.multas where id='c1') = 'pagadaR-0101', 'pago desde el celular';
   assert (select motivo || '/' || infraccion from public.multas where id='c2') = 'otro/cuota_agua', 'infracción propia';
   b := public.sync_bajar('PXT', null);
-  assert jsonb_array_length(b->'infracciones') = 6, 'baja el catálogo';
+  assert jsonb_array_length(b->'infracciones') = 7, 'baja el catálogo';
   assert exists (select 1 from jsonb_array_elements(b->'multas') x where x->>'id'='c2' and x->>'motivo'='cuota_agua'), 'baja con código del catálogo';
   assert exists (select 1 from jsonb_array_elements(b->'assemblies') x where x->>'id'='asm2' and x->>'inicio'='08:00' and (x->>'tolerancia')::int=10), 'baja inicio y tolerancia';
 end $$;

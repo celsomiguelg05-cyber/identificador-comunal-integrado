@@ -42,11 +42,12 @@ create policy infracciones_editar on public.infracciones for update to authentic
   with check ((select app_private.tengo_rol(comunidad_id, array['admin','directiva'])));
 
 insert into public.infracciones (comunidad_id, codigo, nombre, monto, orden) values
-  ('PXT', 'inasistencia', 'Falta a asamblea',                 25, 1),
-  ('PXT', 'tardanza',     'Llegar tarde',                       5, 2),
-  ('PXT', 'sin_salida',   'Irse sin marcar salida',            10, 3),
-  ('PXT', 'faena',        'Falta a faena',                     50, 4),
-  ('PXT', 'convenio',     'Rechazar un convenio comunal',     100, 5)
+  ('PXT', 'inasistencia', 'Falta a asamblea',                 50, 1),
+  ('PXT', 'tardanza',     'Llegar tarde',                      10, 2),
+  ('PXT', 'sin_salida',   'Irse sin marcar salida',            25, 3),
+  ('PXT', 'faena',        'Falta a faena',                     75, 4),
+  ('PXT', 'convenio',     'Rechazar un convenio comunal',     100, 5),
+  ('PXT', 'otro',         'Otra (monto se escribe cada vez)',   0, 6)
 on conflict do nothing;
 
 -- ---------------------------------------------------------------------
