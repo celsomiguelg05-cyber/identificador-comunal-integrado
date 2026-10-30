@@ -9,6 +9,11 @@ Carné comunal de Paxtocá, Totonicapán. Sustituye el ticket de papel de las as
 | `/mi-carne/` | **Mi Carné** (miembro): carné con QR que cambia cada 30 segundos, su asistencia y sus multas |
 | `fuente/` | Código fuente (`python3 fuente/construir.py` regenera `app/` y `mi-carne/`) |
 
-Las dos se instalan en Android desde Chrome (menú ⋮ → «Instalar app» o «Agregar a pantalla principal») y funcionan sin internet después de abrirlas una vez.
+**Dónde se usa cada una**
+
+- **Control Comunal va en una laptop.** Abra `/app/` en Chrome o Edge y toque el ícono de instalar en la barra de direcciones (o menú ⋮ → «Instalar Control Comunal»). La cámara de la laptop escanea los carnés. En un celular también funciona, pero solo para emergencias.
+- **Mi Carné va en el celular del vecino.** Abra `/mi-carne/` en Chrome para Android y elija menú ⋮ → «Instalar app» (o «Agregar a pantalla principal»).
+
+Las dos funcionan sin internet después de abrirlas una vez.
 
 Creado por Tecnoiagt · https://www.tecnoiagt.com
