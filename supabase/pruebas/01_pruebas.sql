@@ -226,5 +226,58 @@ end $$;
 reset role;
 \echo '   OK'
 
+-- ===== 11. Multas completas: tardanza, convenios, catálogo, sincronización =====
+\echo '11. tardanza, convenios, catálogo y multas por sincronización'
+select pg_temp.como('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+-- operador: asamblea con hora de inicio 08:00 y 10 min de tolerancia (hora Guatemala = UTC-6)
+select (public.sync_subir('PXT', 'cel-A', $j${
+ "assemblies":[{"id":"asm2","nombre":"Asamblea de noviembre","fecha":"2026-11-01","inicio":"08:00","tolerancia":10,"abierta":true,"abierta_en":1793541600000}],
+ "marks":[
+  {"id":"n1","asamblea":"asm2","persona":"PXT-0001","tipo":"entrada","hora":1793541900000,"via":"carne"},
+  {"id":"n2","asamblea":"asm2","persona":"PXT-0002","tipo":"entrada","hora":1793543400000,"via":"carne"},
+  {"id":"n3","asamblea":"asm2","persona":"PXT-0001","tipo":"salida","hora":1793552400000,"via":"carne"},
+  {"id":"n4","asamblea":"asm2","persona":"PXT-0002","tipo":"salida","hora":1793552400000,"via":"carne"}]}$j$::jsonb))->>'ok';
+-- el operador no puede tocar multas ni catálogo
+select (public.sync_subir('PXT', 'cel-A', $j${"infracciones":[{"codigo":"tardanza","nombre":"Tarde","monto":1}],
+  "multas":[{"id":"x1","persona":"PXT-0003","asamblea":null,"motivo":"convenio","monto":100,"estado":"pendiente","creada":1793541600000}]}$j$::jsonb))->'rechazados';
+select (public.sync_subir('PXT', 'cel-A', $j${"assemblies":[{"id":"asm2","nombre":"Asamblea de noviembre","fecha":"2026-11-01","abierta":false,"cerrada_en":1793553000000}]}$j$::jsonb))->>'ok';
+reset role;
+do $$ begin
+  assert (select inicio from public.asambleas where id='asm2') = '08:00', 'inicio guardado';
+  assert (select tolerancia from public.asambleas where id='asm2') = 10, 'tolerancia guardada';
+  assert (select tarde from public.v_asistencia where asamblea_id='asm2' and morador_id='PXT-0002'), 'Pedro llegó 30 min tarde';
+  assert not (select tarde from public.v_asistencia where asamblea_id='asm2' and morador_id='PXT-0001'), 'Juana a tiempo (5 min)';
+  assert (select count(*) from public.multas where id='x1') = 0, 'operador no crea multas';
+  assert (select monto from public.infracciones where codigo='tardanza') = 5, 'operador no cambia catálogo';
+end $$;
+
+select pg_temp.como('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+-- directiva cambia el monto de la tardanza y agrega una infracción propia
+select (public.sync_subir('PXT', 'cel-D', $j${"infracciones":[{"codigo":"tardanza","nombre":"Llegar tarde","monto":7.5},
+  {"codigo":"cuota_agua","nombre":"No pagar la cuota de agua","monto":20,"orden":9}]}$j$::jsonb))->>'ok';
+select 'multas asm2: ' || public.generar_multas('asm2');
+select morador_id, motivo, monto, descripcion from public.multas where asamblea_id='asm2' order by morador_id, motivo;
+-- multas desde el celular: convenio, catálogo propio, pago y reintento
+select (public.sync_subir('PXT', 'cel-D', $j${"multas":[
+  {"id":"c1","persona":"PXT-0003","asamblea":null,"motivo":"convenio","descripcion":"Rechazó el convenio del agua","monto":100,"estado":"pendiente","creada":1793541600000},
+  {"id":"c2","persona":"PXT-0001","asamblea":null,"motivo":"cuota_agua","monto":20,"estado":"pagada","creada":1793541600000,"pagada_en":1793600000000,"recibo":"R-0100"}]}$j$::jsonb))->>'ok';
+select (public.sync_subir('PXT', 'cel-D', $j${"multas":[{"id":"c1","persona":"PXT-0003","motivo":"convenio","monto":100,"estado":"pagada","pagada_en":1793700000000,"recibo":"R-0101"}]}$j$::jsonb))->>'ok';
+select (public.sync_subir('PXT', 'cel-D', $j${"multas":[{"id":"c1","persona":"PXT-0003","motivo":"convenio","monto":100,"estado":"pendiente"}]}$j$::jsonb))->'rechazados';
+do $$ declare b jsonb; begin
+  assert (select count(*) from public.multas where asamblea_id='asm2' and motivo='tardanza') = 1, 'una tardanza';
+  assert (select monto from public.multas where asamblea_id='asm2' and motivo='tardanza') = 7.5, 'monto del catálogo actualizado';
+  assert (select motivo from public.multas where asamblea_id='asm2' and morador_id='PXT-0003') = 'inasistencia';
+  assert (select estado || recibo from public.multas where id='c1') = 'pagadaR-0101', 'pago desde el celular';
+  assert (select motivo || '/' || infraccion from public.multas where id='c2') = 'otro/cuota_agua', 'infracción propia';
+  b := public.sync_bajar('PXT', null);
+  assert jsonb_array_length(b->'infracciones') = 6, 'baja el catálogo';
+  assert exists (select 1 from jsonb_array_elements(b->'multas') x where x->>'id'='c2' and x->>'motivo'='cuota_agua'), 'baja con código del catálogo';
+  assert exists (select 1 from jsonb_array_elements(b->'assemblies') x where x->>'id'='asm2' and x->>'inicio'='08:00' and (x->>'tolerancia')::int=10), 'baja inicio y tolerancia';
+end $$;
+reset role;
+\echo '   OK'
+
 select 'bitácora: ' || count(*) || ' registros' from public.auditoria;
 \echo 'TODAS LAS PRUEBAS PASARON'
