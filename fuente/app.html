@@ -33,6 +33,8 @@ header.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
 .top small{color:var(--muted);font-size:13px;display:block}
 .top .grow{flex:1;min-width:0}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.sndBtn{width:44px;min-height:44px;padding:0;flex:none;color:var(--muted)}
+.sndBtn[aria-pressed="true"]{color:var(--indigo)}
 .pill.live{background:var(--ok-bg);color:var(--ok)}
 .pill.live::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 main{padding-block:16px;display:grid;gap:16px}
@@ -148,6 +150,7 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
   <div class="mark" aria-hidden="true">CC</div>
   <div class="grow"><h1 id="hdrTitle">Carné comunal</h1><small id="hdrSub">Comunidad de Paxtocá · Totonicapán</small></div>
   <span class="pill" id="hdrPill">Sin asamblea</span>
+  <button type="button" class="sndBtn" id="sndBtn" aria-pressed="true" aria-label="Sonido" title="Sonido"></button>
 </div></header>
 
 <div class="wrap"><main>
@@ -282,11 +285,19 @@ td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
       </div>
     </div>
     <div class="card">
+      <h3>Sonidos</h3>
+      <p class="muted">Tonos suaves de marimba al escanear un carné, registrar la entrada o salida, cobrar una multa y cuando algo no está bien. Así el operador sabe qué pasó sin mirar la pantalla.</p>
+      <div class="grid2">
+        <button type="button" id="sndCfg"></button>
+        <button type="button" id="sndTest">Escuchar los sonidos</button>
+      </div>
+    </div>
+    <div class="card">
       <h3>Seguridad del carné</h3>
       <p class="muted">Cada código QR va firmado con la llave de esta comunidad. Un carné copiado a mano, alterado o reemplazado se rechaza al escanearlo. Huella de la llave: <span class="code" id="keyFp"></span></p>
       <button type="button" class="danger" id="wipe">Borrar todos los datos</button>
     </div>
-    <p class="foot">Versión demo 1.4 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+    <p class="foot">Versión demo 1.5 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
   </section>
 </main></div>
 
@@ -316,7 +327,7 @@ const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.g
 const fullName = p => `${p.nombres} ${p.apellidos}`.trim();
 const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const unb64u = s => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
+function toast(msg, sonido = "guardado"){ Sonido.tocar(sonido); const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
 function armConfirm(btn, label, fn){
   btn.addEventListener("click", () => {
     if (btn.classList.contains("armed")) { btn.classList.remove("armed"); btn.textContent = btn.dataset.orig; clearTimeout(btn._t); fn(); return; }
@@ -467,7 +478,7 @@ async function commitMark(per, via, motivo){
   const a = activeAsm();
   const m = { id: uid(), asamblea: a.id, persona: per.id, tipo: S.mode, hora: Date.now(), via, motivo: motivo || "", ejemplo: false };
   S.marks.push(m); await put("marks", m);
-  toast(`${S.mode === "entrada" ? "Entrada" : "Salida"} registrada: ${fullName(per)}`);
+  toast(`${S.mode === "entrada" ? "Entrada" : "Salida"} registrada: ${fullName(per)}`, "registrado");
   if (navigator.vibrate) try { navigator.vibrate(80); } catch {}
   renderAsm();
 }
@@ -561,7 +572,7 @@ async function saveFile(filename, data){
     if (dlCap === undefined) dlCap = await window.claude.use("downloads");
     if (dlCap) {
       try { await dlCap.save({filename, data}); toast("Archivo listo"); return; }
-      catch (e) { if (e && e.code === "declined") return; if (!["unavailable","not_granted","capability_disabled","capability_removed"].includes(e && e.code)) { toast("No se pudo guardar el archivo"); return; } }
+      catch (e) { if (e && e.code === "declined") return; if (!["unavailable","not_granted","capability_disabled","capability_removed"].includes(e && e.code)) { toast("No se pudo guardar el archivo", "error"); return; } }
     }
   }
   const blob = data instanceof Blob ? data : new Blob([data]);
@@ -623,11 +634,11 @@ function renderAsm(){
 $("#asmForm").addEventListener("submit", async e => {
   e.preventDefault();
   const a = { id: uid(), tipo: $("#asmTipo").value, nombre: $("#asmName").value.trim() || "Asamblea", fecha: $("#asmDate").value || todayISO(), inicio: $("#asmIni").value || "08:00", tolerancia: +$("#asmTol").value || 0, abierta: true, abierta_en: Date.now(), cerrada_en: null, ejemplo: false };
-  S.assemblies.set(a.id, a); await put("assemblies", a); S.mode = "entrada"; renderAsm(); toast("Asamblea abierta");
+  S.assemblies.set(a.id, a); await put("assemblies", a); S.mode = "entrada"; renderAsm(); toast("Asamblea abierta", "abrir");
 });
 armConfirm($("#closeAsm"), "Toque otra vez para cerrar", async () => {
   const a = activeAsm(); if (!a) return; a.abierta = false; a.cerrada_en = Date.now(); await put("assemblies", a);
-  stopCam(); toast("Asamblea cerrada. Revise el reporte."); renderAsm();
+  stopCam(); toast("Asamblea cerrada. Revise el reporte.", "cerrar"); renderAsm();
 });
 document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { S.mode = b.dataset.mode; renderAsm(); }));
 
@@ -669,7 +680,7 @@ $("#snapQR").addEventListener("change", async e => {
   const f = e.target.files[0]; e.target.value = ""; if (!f) return;
   const url = URL.createObjectURL(f);
   try { const img = await loadImg(url); const t = await decodeSource(img, img.naturalWidth, img.naturalHeight);
-    if (t) handleQR(t); else toast("No se encontró el código. Acerque más el carné y tome otra foto.");
+    if (t) handleQR(t); else toast("No se encontró el código. Acerque más el carné y tome otra foto.", "aviso");
   } finally { URL.revokeObjectURL(url); }
 });
 async function handleQR(txt){
@@ -683,6 +694,7 @@ const edad = d => { const b = new Date(d + "T12:00:00"), n = new Date(); let a =
 function showVerdict(v, motivo){
   const done = () => { Scan.busy = false; };
   const word = S.mode === "entrada" ? "entrada" : "salida";
+  Sonido.tocar(v.kind === "ok" ? "valido" : v.kind === "warn" ? "aviso" : "error");
   if (v.kind === "ok") {
     openSheet(`
       ${whoBlock(v.person)}
@@ -691,7 +703,7 @@ function showVerdict(v, motivo){
       <button class="ok block" type="button" id="vYes">Sí, es la persona · marcar ${word}</button>
       <button class="danger block" type="button" id="vNo">No es la persona</button>`, done);
     $("#vYes").addEventListener("click", async () => { await commitMark(v.person, v.via, motivo); closeSheet(); });
-    $("#vNo").addEventListener("click", async () => { await incident("suplantacion", v.person.id, "La foto no coincide con quien presentó el carné"); closeSheet(); toast("Alerta registrada: posible suplantación"); renderAsm(); });
+    $("#vNo").addEventListener("click", async () => { await incident("suplantacion", v.person.id, "La foto no coincide con quien presentó el carné"); closeSheet(); toast("Alerta registrada: posible suplantación", "error"); renderAsm(); });
   } else {
     openSheet(`
       ${v.person ? whoBlock(v.person) : ""}
@@ -778,7 +790,7 @@ async function digitalEnroll(p){
     <button type="button" class="primary block" id="eCopy">Copiar código para enviarlo</button>
     <button type="button" class="block" id="eBack">Volver</button>`);
   $("#eCopy").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(t); toast("Código copiado"); }
+    try { await navigator.clipboard.writeText(t); toast("Código copiado", "toque"); }
     catch { openSheet(`<h2>Copie este texto</h2><textarea readonly style="width:100%;min-height:140px;font:14px var(--f-mono)">${esc(t)}</textarea><button type="button" class="block" id="eBack">Volver</button>`); $("#eBack").addEventListener("click", () => personDetail(p.id)); const ta = $("#sheetPanel textarea"); ta.focus(); ta.select(); }
   });
   $("#eBack").addEventListener("click", () => personDetail(p.id));
@@ -922,13 +934,13 @@ function multaDetail(id){
   armConfirm($("#mPay"), `Toque otra vez: recibir ${quetzales(m.monto)}`, async () => {
     S.recibo += 1; await putKV("recibo", S.recibo);
     Object.assign(m, { estado: "pagada", pagada_en: Date.now(), recibo: "R-" + String(S.recibo).padStart(4, "0") });
-    await guardarMulta(m); renderMultas(); recibo(m);
+    await guardarMulta(m); Sonido.tocar("cobro"); renderMultas(); recibo(m);
   });
   const cerrar = (estado, verbo) => async () => {
     const nota = $("#mNota").value.trim();
     if (!nota) { $("#mErr").textContent = `Escriba el motivo para ${verbo}. Queda anotado en la multa.`; $("#mErr").hidden = false; return; }
     Object.assign(m, { estado, nota: `${estado === "condonada" ? "Condonada" : "Anulada"}: ${nota}` }); await guardarMulta(m);
-    toast(`Multa ${ESTADO_MULTA[estado].toLowerCase()}`); closeSheet(); renderMultas();
+    toast(`Multa ${ESTADO_MULTA[estado].toLowerCase()}`, "quitar"); closeSheet(); renderMultas();
   };
   $("#mCond").addEventListener("click", cerrar("condonada", "condonar"));
   $("#mAnul").addEventListener("click", cerrar("anulada", "anular"));
@@ -1035,8 +1047,8 @@ $("#bkDown").addEventListener("click", () => {
 });
 $("#bkUp").addEventListener("change", async e => {
   const f = e.target.files[0]; e.target.value = ""; if (!f) return;
-  let d; try { d = JSON.parse(await f.text()); } catch { toast("El archivo no es una copia válida"); return; }
-  if (d.app !== "carne-comunal" || !d.keys || !Array.isArray(d.people)) { toast("El archivo no es una copia del carné comunal"); return; }
+  let d; try { d = JSON.parse(await f.text()); } catch { toast("El archivo no es una copia válida", "error"); return; }
+  if (d.app !== "carne-comunal" || !d.keys || !Array.isArray(d.people)) { toast("El archivo no es una copia del carné comunal", "error"); return; }
   openSheet(`<h2>Restaurar copia</h2><p>La copia es del ${esc(new Date(d.exportado).toLocaleString("es-GT"))} y trae ${d.people.length} moradores y ${d.assemblies.length} asambleas.</p>
     <div class="verdict warn"><strong>Se reemplazará todo lo que hay en este equipo</strong><p>Incluida la llave de firma. Los carnés firmados por otra llave dejarán de valer aquí.</p></div>
     <button class="danger block" type="button" id="rsYes">Reemplazar con la copia</button><button class="block" type="button" id="rsNo">Cancelar</button>`);
@@ -1052,7 +1064,7 @@ $("#bkUp").addEventListener("change", async e => {
 });
 $("#demoOff").addEventListener("click", async () => { await quitarDemo();
   if (!S.people.size) { S.seq = 0; await putKV("seq", 0); }
-  stopCam(); renderSettings(); toast("Datos de ejemplo quitados");
+  stopCam(); renderSettings(); toast("Datos de ejemplo quitados", "quitar");
 });
 async function quitarDemo(){
   for (const p of [...S.people.values()].filter(p => p.ejemplo)) { S.people.delete(p.id); await del("people", p.id); }
@@ -1062,10 +1074,23 @@ async function quitarDemo(){
   for (const m of S.multas.filter(m => m.ejemplo)) await del("multas", m.id);
   S.marks = S.marks.filter(m => !m.ejemplo); S.incidents = S.incidents.filter(i => !i.ejemplo); S.multas = S.multas.filter(m => !m.ejemplo);
 }
+/* Botón de sonido (encabezado y ajustes) */
+function renderSonido(){
+  const on = Sonido.activo;
+  $("#sndBtn").innerHTML = iconoSonido(on); $("#sndBtn").setAttribute("aria-pressed", String(on));
+  const t = on ? "Sonido activado (toque para silenciar)" : "Sonido apagado (toque para activar)"; $("#sndBtn").title = t; $("#sndBtn").setAttribute("aria-label", t);
+  $("#sndCfg").textContent = on ? "Apagar sonidos" : "Activar sonidos"; $("#sndTest").disabled = !on;
+}
+$("#sndBtn").addEventListener("click", () => { Sonido.alternar(); renderSonido(); });
+$("#sndCfg").addEventListener("click", () => { Sonido.alternar(); renderSonido(); });
+$("#sndTest").addEventListener("click", () => {
+  ["valido", "registrado", "aviso", "error", "cobro"].forEach((n, i) => setTimeout(() => Sonido.tocar(n), i * 1100));
+});
+renderSonido();
 $("#demoOn").addEventListener("click", async () => { await seedDemo(); renderSettings(); toast("Datos de ejemplo cargados"); });
 armConfirm($("#wipe"), "Toque otra vez: se borra todo menos la llave", async () => {
   await Promise.all(STORES.map(clearStore)); S.people.clear(); S.assemblies.clear(); S.marks = []; S.incidents = []; S.multas = []; S.seq = 0; S.recibo = 0; await putKV("seq", 0); await putKV("recibo", 0);
-  stopCam(); renderSettings(); toast("Datos borrados");
+  stopCam(); renderSettings(); toast("Datos borrados", "quitar");
 });
 
 /* ===== Datos de ejemplo (personas ficticias, compartidos con la app del miembro) ===== */

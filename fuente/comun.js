@@ -97,3 +97,72 @@ function demoConstruir(prefijo){
   incidents.push({ id: "demo-inc-2", asamblea: e4.id, persona: pid(5), tipo: "anulado", detalle: "Presentó el carné número 1; el vigente es el 2", hora: t4 + 19 * 60000, ejemplo: true });
   return { people, assemblies, marks, incidents, multas, recibo };
 }
+
+/* ===== Sonidos: tonos suaves de marimba hechos en el momento con Web Audio (no ocupan archivos y suenan sin internet) ===== */
+const Sonido = (() => {
+  const CLAVE = "carne-comunal-sonido";
+  /* Notas de la escala de Sol, como las teclas de una marimba */
+  const N = { G3:196, B3:246.94, D4:293.66, E4:329.63, G4:392, A4:440, B4:493.88, C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880, B5:987.77, D6:1174.66, E6:1318.51, G6:1567.98 };
+  /* Cada sonido: lista de [nota, tiempo en segundos, fuerza]; "r" al final = redoble (la nota se repite rápido, como en la marimba) */
+  const FRASES = {
+    lectura:    [["E6", 0, .55]],
+    valido:     [["D5", 0, .6], ["G5", .09, .7]],
+    registrado: [["G4", 0, .55], ["B4", .07, .6], ["D5", .14, .65], ["G5", .21, .8, "r"]],
+    aviso:      [["B4", 0, .65], ["B4", .16, .55]],
+    error:      [["D4", 0, .8], ["B3", .14, .8], ["G3", .28, .75]],
+    cobro:      [["D5", 0, .55], ["G5", .06, .6], ["B5", .12, .65], ["D6", .18, .7], ["G6", .3, .45, "r"]],
+    abrir:      [["G4", 0, .5], ["A4", .08, .55], ["B4", .16, .6], ["D5", .24, .65], ["E5", .32, .7], ["G5", .42, .8, "r"]],
+    cerrar:     [["G5", 0, .6], ["E5", .1, .6], ["D5", .2, .6], ["B4", .3, .6], ["G4", .42, .75]],
+    guardado:   [["B4", 0, .55], ["E5", .08, .6]],
+    quitar:     [["E5", 0, .55], ["B4", .1, .55]],
+    toque:      [["D6", 0, .55]],
+    bienvenida: [["D5", 0, .5], ["G5", .1, .6], ["B5", .2, .65], ["D6", .3, .7], ["B5", .46, .45], ["G5", .58, .7, "r"]],
+  };
+  let ctx = null, salida = null;
+  let activo = true; try { activo = localStorage.getItem(CLAVE) !== "0"; } catch {}
+  function iniciar(){
+    if (ctx) { if (ctx.state === "suspended") ctx.resume().catch(() => {}); return ctx; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    ctx = new AC();
+    /* Volumen general, un compresor suave y un poco de eco de salón de madera */
+    salida = ctx.createGain(); salida.gain.value = 1;
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
+    const sala = ctx.createConvolver(), largo = Math.floor(ctx.sampleRate * 1.1), ir = ctx.createBuffer(2, largo, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < largo; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / largo, 3.2); }
+    sala.buffer = ir; const mezcla = ctx.createGain(); mezcla.gain.value = .16;
+    salida.connect(comp); salida.connect(sala); sala.connect(mezcla); mezcla.connect(comp); comp.connect(ctx.destination);
+    return ctx;
+  }
+  /* Una tecla de marimba: tono base que se apaga en medio segundo, el armónico de madera (x4) que se apaga rápido y un golpecito de baqueta */
+  function tecla(f, t, fuerza){
+    const v = .32 * fuerza, dur = Math.min(1.1, 220 / f + .35);
+    const parcial = (mult, gan, caida) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = f * mult;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v * gan, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + caida);
+      o.connect(g); g.connect(salida); o.start(t); o.stop(t + caida + .02);
+    };
+    parcial(1, 1, dur); parcial(4, .22, dur * .22); parcial(9.9, .05, .05);
+  }
+  function tocar(nombre){
+    if (!activo) return;
+    const frase = FRASES[nombre]; if (!frase || !iniciar()) return;
+    const t0 = ctx.currentTime + .02;
+    for (const [n, dt, fuerza, redoble] of frase) {
+      if (redoble) for (let k = 0; k < 5; k++) tecla(N[n], t0 + dt + k * .055, fuerza * (1 - k * .17));
+      else tecla(N[n], t0 + dt, fuerza);
+    }
+  }
+  /* Los navegadores solo dejan sonar después de que la persona toca la pantalla: se prepara con el primer toque */
+  ["pointerdown", "keydown", "touchstart"].forEach(ev => document.addEventListener(ev, () => { if (activo) iniciar(); }, { capture: true, passive: true }));
+  return {
+    tocar,
+    get activo(){ return activo; },
+    poner(si){ activo = !!si; try { localStorage.setItem(CLAVE, activo ? "1" : "0"); } catch {} if (activo) { iniciar(); tocar("guardado"); } },
+    alternar(){ this.poner(!activo); return activo; },
+  };
+})();
+/* Ícono de bocina para el botón de sonido */
+function iconoSonido(on){
+  return `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/>${on ? `<path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>` : `<path d="M17 9l5 6M22 9l-5 6"/>`}</svg>`;
+}
