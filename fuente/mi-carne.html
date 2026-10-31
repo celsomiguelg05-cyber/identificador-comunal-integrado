@@ -21,7 +21,10 @@ p{margin:0}
 .muted{color:var(--muted)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:grid}
 .band{background:var(--indigo);color:var(--indigo-ink);padding:14px 18px}
+.band{display:flex;align-items:center;gap:10px}
+.band > div{flex:1;min-width:0}
 .band b{display:block;font-size:19px}
+.sndBtn{width:44px;min-height:44px;padding:0;flex:none;background:transparent;border-color:transparent;color:inherit;opacity:.9}
 .band span{font-size:14px;opacity:.9}
 .body{padding:18px;display:grid;gap:14px;justify-items:center;text-align:center}
 .name{font-size:24px;font-weight:700;line-height:1.2;text-wrap:balance}
@@ -90,7 +93,7 @@ nav.tabs button[aria-current="page"]{color:var(--indigo)}
 
   <section id="t-carne" hidden>
     <div class="card">
-      <div class="band"><b id="com"></b><span>Carné comunal digital</span></div>
+      <div class="band"><div><b id="com"></b><span>Carné comunal digital</span></div><button type="button" class="sndBtn" id="sndBtn" aria-pressed="true"></button></div>
       <div class="body">
         <span class="badge" id="demoBadge" hidden>Morador de ejemplo</span>
         <div class="name" id="name"></div>
@@ -117,7 +120,7 @@ nav.tabs button[aria-current="page"]{color:var(--indigo)}
     <div id="mulBody" class="list" style="gap:14px"></div>
   </section>
 
-  <p class="foot">Versión demo 1.3 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
+  <p class="foot">Versión demo 1.4 · Creado por Tecnoiagt · <a href="https://www.tecnoiagt.com" target="_blank" rel="noopener">www.tecnoiagt.com</a></p>
 </div>
 <nav class="tabs" id="tabs" aria-label="Secciones" hidden><div class="in">
   <button type="button" data-t="carne" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3M21 14v7h-7"/></svg>Mi carné</button>
@@ -168,7 +171,14 @@ function show(t){
   if (t === "asis") renderAsis(); if (t === "mul") renderMul();
   window.scrollTo(0, 0);
 }
-document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => show(b.dataset.t)));
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => { if (b.dataset.t !== tab) Sonido.tocar("toque"); show(b.dataset.t); }));
+/* Botón de sonido en el carné */
+function renderSonido(){
+  const on = Sonido.activo, b = $("#sndBtn"), t = on ? "Sonido activado (toque para silenciar)" : "Sonido apagado (toque para activar)";
+  b.innerHTML = iconoSonido(on); b.setAttribute("aria-pressed", String(on)); b.title = t; b.setAttribute("aria-label", t);
+}
+$("#sndBtn").addEventListener("click", () => { Sonido.alternar(); renderSonido(); });
+renderSonido();
 /* Datos del morador: en la demo salen del conjunto de ejemplo; con la base comunal vendrán del servidor */
 function misDatos(){
   if (!C.demo) return null;
@@ -212,10 +222,11 @@ async function tick(){
 }
 async function activate(text){
   const c = parse(text), err = $("#err");
-  if (!c) { err.textContent = "Ese no es un código de activación válido. Revise que esté completo."; err.hidden = false; return; }
+  if (!c) { err.textContent = "Ese no es un código de activación válido. Revise que esté completo."; err.hidden = false; Sonido.tocar("error"); return; }
   err.hidden = true;
   let saved = false; try { localStorage.setItem(KEY, String(text).trim()); saved = localStorage.getItem(KEY) !== null; } catch {}
   $("#noStore").hidden = saved;
+  Sonido.tocar("bienvenida");
   start(c);
 }
 function loadImg(src){ return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
@@ -227,7 +238,7 @@ $("#snap").addEventListener("change", async e => {
     cv.width = Math.round(img.naturalWidth * s); cv.height = Math.round(img.naturalHeight * s);
     const g = cv.getContext("2d", {willReadFrequently:true}); g.drawImage(img, 0, 0, cv.width, cv.height);
     const r = jsQR(g.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, {inversionAttempts:"attemptBoth"});
-    if (r) activate(r.data); else { $("#err").textContent = "No se pudo leer el código. Acerque el celular y tome otra foto."; $("#err").hidden = false; }
+    if (r) activate(r.data); else { $("#err").textContent = "No se pudo leer el código. Acerque el celular y tome otra foto."; $("#err").hidden = false; Sonido.tocar("aviso"); }
   } finally { URL.revokeObjectURL(url); }
 });
 $("#activate").addEventListener("click", () => activate($("#paste").value));
@@ -235,8 +246,9 @@ $("#demoList").innerHTML = demoConstruir("PXT").people.map(p => `<button type="b
 $("#demoList").addEventListener("click", e => { const b = e.target.closest("[data-id]"); if (b) activate("DEMO|" + b.dataset.id); });
 $("#remove").addEventListener("click", e => {
   const b = e.currentTarget;
-  if (!b.classList.contains("armed")) { b.dataset.o = b.textContent; b.textContent = "Toque otra vez para quitarlo"; b.classList.add("armed"); setTimeout(() => { b.classList.remove("armed"); b.textContent = b.dataset.o; }, 4000); return; }
+  if (!b.classList.contains("armed")) { Sonido.tocar("aviso"); b.dataset.o = b.textContent; b.textContent = "Toque otra vez para quitarlo"; b.classList.add("armed"); setTimeout(() => { b.classList.remove("armed"); b.textContent = b.dataset.o; }, 4000); return; }
   try { localStorage.removeItem(KEY); } catch {}
+  Sonido.tocar("quitar");
   C = null; ["carne","asis","mul"].forEach(n => $("#t-" + n).hidden = true); $("#tabs").hidden = true; $("#setup").hidden = false; b.classList.remove("armed"); b.textContent = b.dataset.o;
 });
 document.addEventListener("visibilitychange", async () => { if (!document.hidden && C) { try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch {} } });

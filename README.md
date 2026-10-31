@@ -16,4 +16,6 @@ Carné comunal de Paxtocá, Totonicapán. Sustituye el ticket de papel de las as
 
 Las dos funcionan sin internet después de abrirlas una vez.
 
+**Sonidos.** Las dos apps suenan con tonos suaves de marimba (hechos en el momento, sin archivos de audio): carné válido, entrada o salida registrada, avisos, carné falso, multa cobrada, abrir y cerrar la asamblea. El botón de la bocina los apaga; en Control también está en Ajustes › Sonidos, con un botón para escucharlos.
+
 Creado por Tecnoiagt · https://www.tecnoiagt.com
